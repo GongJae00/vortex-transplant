@@ -1,0 +1,62 @@
+# Local environments
+.codex/
+.venv/
+venv/
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.ipynb_checkpoints/
+
+# Local-only paper workspace
+paper/
+workspace/
+
+# Local PaperOrchestra/Codex skill symlink
+skills
+
+# Data, checkpoints, and generated outputs
+data/
+datasets/
+checkpoints/
+outputs/
+runs/
+logs/
+wandb/
+mlruns/
+figures/
+analysis/generated/
+
+# Large model/artifact files
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+*.onnx
+*.h5
+*.hdf5
+*.npy
+*.npz
+*.pkl
+*.pickle
+
+# LaTeX build artifacts
+*.aux
+*.bbl
+*.blg
+*.brf
+*.fdb_latexmk
+*.fls
+*.lof
+*.log
+*.lot
+*.out
+*.synctex.gz
+*.toc
+
+# OS/editor
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
