@@ -1,0 +1,421 @@
+# PM1-LEARNED-V2 CONTRACT
+# Status: DRAFT (not frozen)
+# Freeze condition: All UNFROZEN fields resolved via calibration + PI approval
+
+protocol: PM1-LEARNED-V2
+scientific_version: "2.0.0-draft"
+target_commit: 67b216bf05382c344425ea493119828412c5b3c5
+interpretation_boundary: >
+  This contract governs the calibration and confirmatory phases of PM1-LEARNED-V2.
+  V1 results are explicitly excluded from confirmatory evidence.
+  V2 development-split results are excluded from all statistical tests.
+  Calibration results may set thresholds but not serve as evidence for claims.
+
+# ── Primary Scientific Question ──
+primary_question: >
+  Do U(1) vortex defects in the hidden state of a U(1)-equivariant ConvRNN
+  causally control output behavior on a variable-delay copy task, with
+  effects that are (a) stronger than matched nuisance perturbations,
+  (b) representative-invariant, and (c) on the natural hidden-state manifold?
+
+primary_hypothesis: >
+  Vortex transplant margin > max(nuisance margins), with representative
+  variance < charge variance, and manifold distance < natural variance.
+
+secondary_hypotheses:
+  - U1ConvRNN vortex margin > PlainConvRNN vortex margin (cross-model)
+  - Vortex effect surpasses all null families independently (per-family)
+  - Vortex effect persists at OOD delay (delay=64)
+
+forbidden_claims:
+  - "Vortices are the mechanism of copy task computation"
+  - "Vortices are the only mechanism of copy task computation"
+  - "Vortices are necessary for copy task computation" (unless T8 evidence)
+  - "Vortices are a general computational primitive in neural networks"
+
+# ── Splits ──
+development_split:
+  namespace_prefix: "dev"
+  allowed_actions:
+    - Iterative experimentation
+    - Debugging
+    - Threshold exploration
+  forbidden_actions:
+    - Use in any statistical test
+    - Use as confirmatory evidence
+    - Freeze parameters based on development results
+
+calibration_split:
+  namespace_prefix: "cal"
+  seed_count:
+    status: UNFROZEN
+    candidate_values: [5, 10, 20]
+    calibration_method: "Power analysis on C01-C04 diagnostics"
+    freeze_condition: "PI approval after C01-C04 results"
+  allowed_actions:
+    - Estimate variances (seed, within-seed, representative, null)
+    - Tune decomposition/intervention hyperparameters
+    - Select manifold model (PCA dim, kNN k)
+    - Set statistical thresholds
+    - Run all calibration experiments (C01-C16)
+  forbidden_actions:
+    - Use as confirmatory evidence
+    - Report calibration effect sizes as primary results
+    - Cherry-pick calibration runs
+
+confirmatory_split:
+  namespace_prefix: "confirm"
+  seed_count:
+    status: UNFROZEN
+    candidate_values: [20, 30, 50, 100]
+    calibration_method: "Simulation-based power analysis using calibration variance estimates"
+    freeze_condition: "Power ≥ 0.80 for MDE = 0.5 × calibration effect size"
+  seed_generation_rule: "Hash-separated, incremental from 0, prefix 'confirm'"
+  allowed_actions:
+    - Execute frozen contract
+    - Report all results
+    - Declare go/no-go
+  forbidden_actions:
+    - Modify thresholds after seeing results
+    - Add/remove seeds after starting
+    - Cherry-pick seeds
+
+# ── Model and Task Conditions ──
+model_conditions:
+  u1:
+    type: "U1ConvRNN"
+    channels:
+      primary: 8
+      scalar_gateway:
+        status: UNFROZEN
+        candidate_values: [1]
+        calibration_method: "C05-C06 C=1 micro-pilot"
+        freeze_condition: "C=1 achieves ≥ 90% validation accuracy on copy task"
+    height: 16
+    width: 16
+    kernel_size: 3
+    vocabulary: 10
+  plain:
+    type: "PlainConvRNN"
+    channels: 8
+    height: 16
+    width: 16
+    kernel_size: 3
+    vocabulary: 10
+  factorial_variants:
+    status: UNFROZEN
+    candidates:
+      - "ComplexNoEquiv: complex conv + tanh + LayerNorm (isolates radial_tanh)"
+      - "RealWithEquiv: real conv + radial_tanh (isolates complex structure)"
+    calibration_method: "C16 factorial baseline pilot"
+    freeze_condition: "PI decision based on C14-C15 results"
+
+task_conditions:
+  type: "copy"
+  vocabulary: 10
+  copy_length: 4
+  symbol_count: 8
+  blank_token: 0
+  go_token: 9
+  reverse_copy:
+    status: UNFROZEN
+    included_in_confirmatory: false
+    calibration_method: "C05 models"
+    freeze_condition: "PI decision"
+
+training_conditions:
+  updates: 30000
+  batch_size: 64
+  delay_range: [16, 32]
+  learning_rate: 0.001
+  betas: [0.9, 0.999]
+  grad_clip: 1.0
+  optimizer: "Adam"
+  validation_frequency: 1000
+  heldout_delay: 64
+  checkpoint_selection: "lexicographic: accuracy > cross_entropy > update"
+  blank_embedding_enforcement: true
+
+evaluation_conditions:
+  test_examples: 100
+  test_delay: 64
+  donor_catalog_size: 8
+  bootstrap_resamples: 10000
+
+# ── Topology Definitions ──
+order_parameter:
+  c_equal_1: "complex phase arg(z(x))"
+  c_greater_1:
+    status: UNFROZEN
+    candidate_methods:
+      - "Max-magnitude channel projection"
+      - "PCA first component of phase vectors"
+      - "Learned linear projection w†z(x)"
+      - "SVD of inter-channel phase correlation"
+    calibration_method: "C14 multichannel phase locking analysis"
+    freeze_condition: "Phase locking empirically validated (inter-channel phase correlation > 0.8)"
+    fallback: "C=1 gateway (scalar field)"
+
+topology_definition:
+  plaquette_charge: "round(curl(link_variables) / 2π)"
+  tolerance: 1.0e-10
+  net_charge: "must be zero on torus"
+  valid_channel: "min(|field|) > 1e-8"
+
+branch_stability_definition:
+  edge_margin: "π - |Δθ_e| for each edge e"
+  metrics:
+    - "global_minimum"
+    - "q01_quantile"
+    - "q05_quantile"
+    - "median"
+  stability_threshold:
+    status: UNFROZEN
+    candidate_values:
+      q01: [0.01, 0.05, 0.1]
+    calibration_method: "C04 branch stability across recurrence"
+    freeze_condition: "Empirical distribution separates stable from unstable fields"
+
+hodge_definition:
+  exact_component: "gradient of scalar potential (curl-free)"
+  coexact_component: "curl of stream function (divergence-free, carries Q)"
+  harmonic_component: "both curl-free and divergence-free (2D on T²)"
+  decomposition_method: "FFT-based Poisson solver (existing in canonical_vortex_field)"
+
+representative_definition:
+  same_charge_class: "all fields g with Q(g) = 0 (smooth, charge-free)"
+  representatives_per_sample: 10
+  representative_axis: "harmonic_random (random harmonic sector)"
+  variance_decomposition: "charge variance / total variance"
+
+manifold_definition:
+  methods:
+    primary:
+      status: UNFROZEN
+      candidates:
+        - "PCA reconstruction error (k components from calibration)"
+        - "kNN density ratio (intervened vs natural pool)"
+        - "Nearest natural neighbor L2 distance"
+    calibration_method: "C11 manifold projection comparison"
+    freeze_condition: "Best method selected by PI based on separation of on/off-manifold states"
+  relaxation:
+    steps: 5
+    method: "Autonomous recurrence F (blank transition)"
+  on_manifold_gate:
+    status: UNFROZEN
+    calibration_method: "Threshold from natural-state distribution (e.g., 95th percentile)"
+    freeze_condition: "Calibration establishes clear separation"
+
+# ── Selection and Intervention ──
+recipient_selection:
+  source: "test_examples (heldout delay=64)"
+  minimum_accuracy: 0.95
+  minimum_magnitude: 1e-8
+
+donor_selection:
+  primary: "geometric (signed count, energy, spectrum, displacement)"
+  catalog_size: 8
+  selection_sensitivity:
+    - "random_donor: uniform from admissible catalog"
+    - "all_admissible: average over all admissible pairs"
+  reporting: "Primary + both sensitivities in supplement"
+
+selection_funnel:
+  stages:
+    - "accuracy_filter: recipient accuracy ≥ 0.95"
+    - "magnitude_filter: min(|field|) > 1e-8"
+    - "charge_filter: net_charge == 0 on all channels"
+    - "decomposition_filter: reconstruction_error < 1e-10"
+    - "donor_filter: at least 1 admissible donor in catalog"
+
+# ── Intervention Families ──
+intervention_families:
+  sufficiency_arms:
+    - "vortex: canonical vortex transplant"
+    - "vortex_minimal: minimum-displacement same-charge transplant (V2 new)"
+    - "vortex_alternate: different same-charge representative (V2 new)"
+  necessity_arms:
+    - "vortex_remove_all: replace with v_0 (V2 new)"
+    - "vortex_remove_pair: annihilate single pair (V2 new)"
+    - "vortex_sham: same displacement, no charge change (V2 new)"
+  specificity_arms:
+    - "vortex_sign_flip: Q → -Q (V2 new)"
+  representative_arms:
+    - "vortex_rep_N: N same-charge representatives (V2 new)"
+  harmonic_arms:
+    - "harmonic_swap: donor harmonic, same vortex (V2 new)"
+  component_arms:
+    - "natural_recipient" # no intervention (baseline)
+    - "whole_state"       # complete donor state
+    - "smooth"            # smooth component swap
+    - "magnitude"         # magnitude component swap
+    - "whole_phase"       # full phase swap
+    - "global_phase"      # uniform phase rotation control
+    - "zero_charge_phase" # spatially structured zero-charge control
+  null_families:
+    - "fourier_low"
+    - "fourier_high"
+    - "pca"
+    - "random_direction"
+  natural_controls:
+    - "natural_neighbor: nearest natural state with target topology (V2 new)"
+    - "relaxed: post-intervention recurrence relaxation (V2 new)"
+
+# ── Estimands ──
+primary_estimand:
+  name: "mechanism_advantage"
+  formula: "vortex_margin - max(smooth_margin, magnitude_margin, global_margin, zero_charge_margin, random_margin)"
+  unit: "log-likelihood difference (nats)"
+  aggregation: "mean per seed, then seed-level statistic"
+
+secondary_estimands:
+  - name: "normalized_recovery"
+    formula: "(vortex_margin - NR_margin) / (WS_margin - NR_margin)"
+    edge_cases:
+      denominator_near_zero: "EXCLUDE pair"
+      denominator_negative: "FLAG seed as FAILED_DIRECTIONAL_SANITY if >10%"
+      recovery_over_1: "REPORT as-is, FLAG as vortex > whole_state"
+  - name: "representative_variance_fraction"
+    formula: "Var(rep_effect) / Var(charge_effect)"
+  - name: "manifold_penalty"
+    formula: "on_manifold_effect - raw_effect"
+
+validity_metrics:
+  - "decomposition_reconstruction_error < 1e-10"
+  - "net_charge_zero on all channels"
+  - "minimum_magnitude > 1e-8"
+  - "branch_margin_q01 > threshold (UNFROZEN)"
+  - "whole_state_sanity: WS_margin > 0 (directional sanity)"
+
+normalization_edge_cases:
+  denominator_zero: "exclude"
+  denominator_negative: "flag seed"
+  vortex_over_whole: "report + flag"
+
+# ── Statistical Tests ──
+primary_statistical_test:
+  method: "hierarchical_bootstrap"
+  resamples: 9999
+  level: "seed"
+  ci_method: "percentile"
+  ci_level: 0.95
+  rejection: "CI lower bound > 0"
+
+confidence_interval:
+  type: "bootstrap_percentile"
+  level: 0.95
+  one_sided: false
+
+null_draw_rule:
+  per_family: true
+  draws_per_family:
+    status: UNFROZEN
+    candidate_values: [99, 199, 499]
+    calibration_method: "Order-statistic CI width convergence"
+    freeze_condition: "CI width < 0.1 × effect_estimate at calibration effect size"
+  matched: true
+  seed: "hash-separated per pair"
+
+sample_size_rule:
+  status: UNFROZEN
+  calibration_method: "Simulation with calibration variances"
+  freeze_condition: "Power ≥ 0.80 for MDE = 0.5 × calibration effect_size"
+  power_curve_required: true
+
+multiplicity:
+  primary: "Single test (mechanism_advantage > 0)"
+  per_family: "Exploratory only, Bonferroni corrected"
+  cross_model: "Secondary, paired bootstrap"
+  reporting: "All p-values reported, corrected and uncorrected"
+
+missingness:
+  reasons_recorded:
+    - "NO_DECOMP_PAIR"
+    - "NO_DONOR_SELECTED"
+    - "NO_MATCHED_NULL"
+    - "MANIFOLD_FAILURE"
+    - "NUMERICAL_FAILURE"
+    - "TASK_FAILURE"
+  primary_analysis: "complete_case"
+  sensitivity:
+    - "worst_case_imputation (missing = null effect)"
+    - "all_admissible_donors (no geometric selection)"
+
+sensitivity_analyses:
+  - "all_admissible vs geometric donor selection"
+  - "recipient_level vs seed_level aggregation"
+  - "paired_t and Wilcoxon alternatives to bootstrap"
+  - "random_effects_model (lme4-style)"
+  - "varying_branch_margin_threshold"
+  - "varying_manifold_distance_threshold"
+
+# ── Go/No-Go States ──
+go_states:
+  GO_CONFIRMATORY:
+    condition: "All calibration gates pass, contract frozen"
+    action: "Run confirmatory experiment"
+  GO_REDESIGN:
+    condition: "Calibration shows phenomenon but mechanism insufficient"
+    action: "Iterate on intervention design"
+
+no_go_states:
+  NO_GO_PHENOMENON:
+    condition: "No U(1)-specific vortex phenomenon (U1 = Plain = null)"
+    action: "Publish negative result or pivot research direction"
+  NO_GO_MECHANISM:
+    condition: "Vortices exist but vortex_margin ≤ nuisance_margins"
+    action: "Publish negative result"
+
+inconclusive_states:
+  INCONCLUSIVE_BASELINE:
+    condition: "PlainConvRNN also shows causal vortex effect"
+    action: "Weaken claim to 'U(1) phenomenology' or add factorial baseline"
+  INCONCLUSIVE_REPRESENTATIVE:
+    condition: "Representative variance > charge variance"
+    action: "Improve representative controls and re-calibrate"
+  INCONCLUSIVE_MANIFOLD:
+    condition: ">20% of interventions off-manifold"
+    action: "Improve manifold projection or accept limitation"
+  INCONCLUSIVE_STATISTICS:
+    condition: "Underpowered (CI width > effect size)"
+    action: "Increase seeds or publish with uncertainty"
+  RESOURCE_NO_GO:
+    condition: "Exceeds 14GB VRAM or 168hr wall time"
+    action: "Reduce scope"
+
+# ── Artifact Schema ──
+artifact_schema:
+  version: "2.0.0"
+  per_seed: ["training.json", "model.pt", "evaluation/topology.json",
+             "evaluation/pairs.json", "evaluation/outcomes.json",
+             "evaluation/summary.json", "manifold/pca_basis.npz",
+             "manifold/diagnostics.json"]
+  per_split: ["decision.json"]
+  root: ["manifest.sha256", "source.sha256", "config.json", "environment.json"]
+
+source_hash: "git rev-parse HEAD + git diff --stat"
+config_hash: "sha256 of frozen config JSON"
+environment_record: "pip freeze + nvidia-smi + python --version + OS info"
+no_overwrite_policy: "WriteOnceArtifact (mkdir exist_ok=False, open x mode)"
+
+resource_policy:
+  vram_limit_gb: 14
+  wall_limit_hours:
+    calibration: 48
+    confirmatory: 168
+  rss_limit_gb: 32
+  disk_limit_gb: 50
+
+# ── Unfrozen Parameters Summary ──
+# These values must be set before confirmatory experiment:
+#   1. confirmatory_split.seed_count
+#   2. calibration_split.seed_count
+#   3. order_parameter.c_greater_1.method (or fallback to C=1)
+#   4. manifold_definition.methods.primary
+#   5. branch_stability_definition.stability_threshold
+#   6. manifold_definition.on_manifold_gate
+#   7. null_draw_rule.draws_per_family
+#   8. sample_size_rule (dependent on #1)
+#   9. model_conditions.u1.channels.scalar_gateway
+#  10. model_conditions.factorial_variants (included or not)
+#  11. task_conditions.reverse_copy (included or not)
