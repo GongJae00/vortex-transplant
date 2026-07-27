@@ -1,46 +1,65 @@
 # PM1-LEARNED-V2 MASTER PLAN — Artifact Index
 
-**Status**: IN PROGRESS
+**Status**: DRAFT-2 — NOT FROZEN
 **Target commit**: `67b216bf05382c344425ea493119828412c5b3c5`
-**Branch**: `main` (HEAD == origin/main)
-**Working tree**: clean (only untracked `PM1_LEARNED_V2_MASTER_PLAN.md`)
+**Planning commit**: `34d0adb` (DRAFT-1, superseded)
 
 ## Deliverable Map
 
 | # | File | Status | Content |
 |---|------|--------|---------|
-| D0 | `00_INDEX.md` | DONE | This index |
-| D1 | `01_REPOSITORY_MANIFEST.md` | DONE | Full tracked-file census with blob SHA, size, role, dependencies |
-| D2 | `02_DRAFT0_CORRECTION_LEDGER.md` | DONE | 17 correction items with verdicts, evidence, reasoning |
-| D3 | `03_PRIOR_AUDIT_43_FINDINGS.md` | DONE | Individual adjudication of all 43 prior audit findings |
-| D4 | `04_ADDITIONAL_FINDINGS.md` | DONE | New findings discovered during this audit |
-| D5 | `05_LITERATURE_AND_NOVELTY.md` | DONE | Systematic literature matrix and novelty adjudication |
-| D6 | `06_MATHEMATICAL_FOUNDATIONS.md` | IN PROGRESS | Equivariance, homotopy, multichannel, Hodge theory |
-| D7 | `07_CAUSAL_IDENTIFICATION.md` | IN PROGRESS | SCM, estimands, sufficiency/necessity/specificity |
-| D8 | `08_STATISTICAL_ANALYSIS_PLAN.md` | IN PROGRESS | Hierarchy, splits, primary test, power, multiplicity |
-| D9 | `09_EXPERIMENT_REGISTRY.md` | IN PROGRESS | 20 experiment cards with full specifications |
-| D10 | `10_IMPLEMENTATION_SPEC.md` | IN PROGRESS | Per-file migration plan, API, dataclass specs |
-| D11 | `11_TEST_AND_TRACEABILITY.md` | IN PROGRESS | Finding-test-code mapping, required new tests |
-| D12 | `12_REPRODUCIBILITY_AND_ARTIFACTS.md` | IN PROGRESS | Smoke gates, artifact schema, clean-room instructions |
-| D13 | `13_RESOURCE_SCHEDULE_AND_VOI.md` | IN PROGRESS | Throughput model, phase estimates, VOI ordering |
-| D14 | `14_MANUSCRIPT_REVIEWER_AND_VENUE.md` | IN PROGRESS | Claim tiers, reviewer simulation, venue analysis |
-| D15 | `15_PM1_LEARNED_V2_CONTRACT.yaml` | IN PROGRESS | Frozen/freezable YAML contract for V2 |
-| D16 | `16_OPEN_QUESTIONS_AND_DECISIONS.md` | IN PROGRESS | Unresolved decisions pending PI input |
-| D17 | `99_COMPLETENESS_CHECKLIST.md` | PENDING | Cross-verification of all deliverables |
+| D0 | `00_INDEX.md` | COMPLETE | This index |
+| D1 | `01_REPOSITORY_MANIFEST.md` | COMPLETE | Full tracked-file census (42 files) |
+| D2 | `02_DRAFT0_CORRECTION_LEDGER.md` | COMPLETE | 17 corrections with verdicts |
+| D3a | `03_PRIOR_AUDIT_43_FINDINGS.md` | COMPLETE | Individual adjudication of all 43 findings |
+| D3b | `03_DIAGNOSTIC_RESULTS.md` | COMPLETE | CPU diagnostic results (exact 128-example replication) |
+| D4 | `04_ADDITIONAL_FINDINGS.md` | COMPLETE | 9 new findings with severity grading |
+| D5 | `05_LITERATURE_AND_NOVELTY.md` | COMPLETE | Literature matrix; systematic search executed |
+| D6 | `06_MATHEMATICAL_FOUNDATIONS.md` | COMPLETE | Equivariance, Hodge, minimal surgery, C>1 |
+| D7 | `07_CAUSAL_IDENTIFICATION.md` | COMPLETE | IUT logic, donor metrics, missingness |
+| D8 | `08_STATISTICAL_ANALYSIS_PLAN.md` | COMPLETE | IUT primary test, SESOI, missingness policy |
+| D9 | `09_EXPERIMENT_REGISTRY.md` | PARTIAL | Full experiment cards needed |
+| D10 | `10_IMPLEMENTATION_SPEC.md` | PARTIAL | Design corrections needed |
+| D11 | `11_TEST_AND_TRACEABILITY.md` | COMPLETE | 20 new tests + existing mapping |
+| D12 | `12_REPRODUCIBILITY_AND_ARTIFACTS.md` | PARTIAL | Subprocess isolation, source hash pending |
+| D13 | `13_RESOURCE_SCHEDULE_AND_VOI.md` | PARTIAL | Training step count, stop conditions pending |
+| D14 | `14_MANUSCRIPT_REVIEWER_AND_VENUE.md` | COMPLETE | Distill removed, conditional venue matrix |
+| D15 | `15_PM1_LEARNED_V2_CONTRACT.yaml` | COMPLETE | Status tags, IUT, SESOI, all families |
+| D16 | `16_OPEN_QUESTIONS_AND_DECISIONS.md` | COMPLETE | 10 PI decisions with recommendations |
+| D17 | `99_COMPLETENESS_CHECKLIST.md` | COMPLETE | Cross-verification checklist |
+| S1 | `PLAN_VALIDATION.json` | COMPLETE | Automated plan integrity check |
+| S2 | `diagnostics/README.md` | COMPLETE | Diagnostic package README |
+| S3 | `diagnostics/environment.json` | COMPLETE | Diagnostic environment info |
+| S4 | `diagnostics/metric_definitions.py` | COMPLETE | Canonical metric definitions |
+| S5 | `diagnostics/run_untrained_topology.py` | COMPLETE | Exact gate replication script |
+| S6 | `diagnostics/commands.txt` | COMPLETE | Reproduction commands |
+| S7 | `diagnostics/raw/untrained_gate_replication.json` | COMPLETE | Raw diagnostic output |
+| S8 | `diagnostics/sha256.json` | COMPLETE | SHA-256 of all planning docs |
+| S9 | `tools/validate_plan.py` | COMPLETE | Plan integrity linter |
 
-## Quick Nav: Most Critical Items
+## Status Totals
 
-1. **[02_DRAFT0_CORRECTION_LEDGER.md](./02_DRAFT0_CORRECTION_LEDGER.md)** — Start here. Four factual errors found in DRAFT-0.
-2. **[03_PRIOR_AUDIT_43_FINDINGS.md](./03_PRIOR_AUDIT_43_FINDINGS.md)** — Adjudication of all 43 prior findings.
-3. **[16_OPEN_QUESTIONS_AND_DECISIONS.md](./16_OPEN_QUESTIONS_AND_DECISIONS.md)** — Questions needing PI input before freezing V2.
-4. **[15_PM1_LEARNED_V2_CONTRACT.yaml](./15_PM1_LEARNED_V2_CONTRACT.yaml)** — The target frozen contract (when ready).
+| Status | Count |
+|--------|------:|
+| COMPLETE | 24 |
+| PARTIAL | 4 |
+| BLOCKED | 0 |
+| NOT_STARTED | 0 |
 
-## Plan-Only / Compute Boundaries
+## Quick Nav
+
+1. **[02_DRAFT0_CORRECTION_LEDGER.md](./02_DRAFT0_CORRECTION_LEDGER.md)** — DRAFT-0 errors and corrections
+2. **[03_PRIOR_AUDIT_43_FINDINGS.md](./03_PRIOR_AUDIT_43_FINDINGS.md)** — Full 43-finding adjudication
+3. **[03_DIAGNOSTIC_RESULTS.md](./03_DIAGNOSTIC_RESULTS.md)** — CPU diagnostic results
+4. **[15_PM1_LEARNED_V2_CONTRACT.yaml](./15_PM1_LEARNED_V2_CONTRACT.yaml)** — Draft V2 contract
+5. **[16_OPEN_QUESTIONS_AND_DECISIONS.md](./16_OPEN_QUESTIONS_AND_DECISIONS.md)** — PI decisions needed
+6. **[diagnostics/](./diagnostics/)** — Scripts and raw data
+
+## Boundaries
 
 - Source code: READ ONLY
-- V1 configs: READ ONLY
-- V1 artifacts: READ ONLY
+- V1 configs/artifacts: READ ONLY
 - Full training: FORBIDDEN until V2 frozen
 - GPU training: FORBIDDEN
-- Low-cost CPU diagnostics: ALLOWED (≤30 min wall, ≤100 training updates)
-- Planning documents: WRITE ALLOWED under `planning/PM1-LEARNED-V2/`
+- Low-cost CPU diagnostics: ALLOWED (<30 min wall)
+- Planning documents: WRITE ALLOWED

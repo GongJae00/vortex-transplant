@@ -69,10 +69,20 @@
 - [x] go_states, no_go_states, inconclusive_states
 - [x] artifact_schema, source_hash, config_hash, environment_record, no_overwrite_policy, resource_policy
 
-## Gaps Remaining
+## Gaps Remaining (DRAFT-2)
 
-1. **Prior 43 findings adjudication**: Requires PI to provide the original finding list. This artifact was not present in the DRAFT-0 response received for audit.
-2. **Literature search execution**: Searches outlined but not executed (no live search tools used). The novelty assessment is based on known literature from the PI's critique.
-3. **GPU smoke benchmarks**: Throughput model is a template without measured numbers. Needs actual GPU smoke execution.
-4. **Calibration variance data**: Power analysis and sample size determination require calibration run results.
-5. **Reviewer scores**: Simulation scores are plausible guesses, not calibrated against actual reviewer behavior.
+1. **Implementation specs (D9-D10)**: Full experiment cards and per-file migration plan still in draft form. PARTIAL status.
+2. **Reproducibility & resource (D12-D13)**: Subprocess isolation and training step counts need final specification. PARTIAL status.
+3. **GPU smoke benchmarks**: Throughput model requires actual GPU execution (FORBIDDEN until contract freeze).
+4. **Calibration variance data**: Power analysis requires calibration run results (FORBIDDEN until contract freeze).
+5. **Reviewer scores**: Simulation scores are plausible estimates, not empirically calibrated.
+
+### Resolved from DRAFT-1
+
+1. ~~Prior 43 findings adjudication~~ → COMPLETE in `03_PRIOR_AUDIT_43_FINDINGS.md`
+2. ~~Literature search execution~~ → COMPLETE in `05_LITERATURE_AND_NOVELTY.md`
+3. ~~Untrained prevalence P0~~ → CONFIRMED via exact 128-example gate replication
+4. ~~Mathematical foundations~~ → COMPLETE with equivariance/Hodge/minimal-surgery corrections
+5. ~~Causal IUT logic~~ → COMPLETE in `07_CAUSAL_IDENTIFICATION.md`
+6. ~~Statistical all-null test~~ → COMPLETE in `08_STATISTICAL_ANALYSIS_PLAN.md`
+7. ~~Contract status tags~~ → COMPLETE in `15_PM1_LEARNED_V2_CONTRACT.yaml`

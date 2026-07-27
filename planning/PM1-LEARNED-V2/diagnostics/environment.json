@@ -1,0 +1,8 @@
+{
+  "python": "3.11+",
+  "pytorch": "2.12+",
+  "numpy": "2.0+",
+  "device": "cpu",
+  "commit": "67b216bf05382c344425ea493119828412c5b3c5",
+  "timestamp": "2026-07-27"
+}

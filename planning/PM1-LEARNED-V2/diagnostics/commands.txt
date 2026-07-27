@@ -1,0 +1,8 @@
+# Exact commands for reproducing diagnostics
+
+# Untrained gate replication (128 examples, 10 seeds x 2 models)
+cd /home/gongjae/projects/research/vortex-transplant
+python planning/PM1-LEARNED-V2/diagnostics/run_untrained_topology.py
+
+# Output: planning/PM1-LEARNED-V2/diagnostics/raw/untrained_gate_replication.json
+# Elapsed: ~139s on CPU

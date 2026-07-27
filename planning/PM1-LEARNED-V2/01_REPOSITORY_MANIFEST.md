@@ -70,11 +70,11 @@ Generated from `git ls-tree -r --long HEAD`.
 | `pyproject.toml` | `6a97b52` | 1192 | Build config (setuptools), deps |
 | `uv.lock` | `e904db1` | 151831 | Dependency lock file |
 
-### Paper Directory (not in main package; placeholder only)
+### Paper Directory (scaffold; manuscript not yet written)
 | Path | Role |
 |------|------|
-| `paper/main.tex` | Placeholder LaTeX scaffold |
-| `paper/main.pdf` | Compiled placeholder |
+| `paper/main.tex` | LaTeX scaffold (no scientific content) |
+| `paper/main.pdf` | Compiled scaffold (no scientific content) |
 | `paper/references.bib` | One unrelated entry |
 | `paper/AGENTS.md` | Paper workspace instructions |
 | `paper/README.md` | Paper workspace README |

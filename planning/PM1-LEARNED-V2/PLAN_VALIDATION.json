@@ -1,0 +1,67 @@
+{
+  "overall_pass": true,
+  "checks": [
+    {
+      "name": "01_index_consistency",
+      "pass": true,
+      "detail": "All index entries exist on disk; status totals match"
+    },
+    {
+      "name": "02_artifact_count",
+      "pass": true,
+      "detail": "28 indexed, 0 unindexed, 28 entries"
+    },
+    {
+      "name": "03_no_tbd_in_complete",
+      "pass": true,
+      "detail": "No TBD/placeholder in COMPLETE files"
+    },
+    {
+      "name": "04_markdown_links",
+      "pass": true,
+      "detail": "All internal markdown links valid"
+    },
+    {
+      "name": "05_yaml_parsing",
+      "pass": true,
+      "detail": "Contract parses without error"
+    },
+    {
+      "name": "06_43_finding_ids",
+      "pass": true,
+      "detail": "43 finding sections confirmed (1-43)"
+    },
+    {
+      "name": "07_17_correction_ids",
+      "pass": true,
+      "detail": "All 17 correction IDs (C-01 through C-17) present"
+    },
+    {
+      "name": "08_diagnostic_raw_json",
+      "pass": true,
+      "detail": "1 raw JSON files parse without error"
+    },
+    {
+      "name": "09_contract_status_tags",
+      "pass": true,
+      "detail": "All contract scalars have valid status tags; unfrozen values have calibration_method/freeze_condition"
+    },
+    {
+      "name": "10_source_hash",
+      "pass": true,
+      "detail": "Source hash is content-addressed: 'git rev-parse HEAD + git diff --stat'"
+    },
+    {
+      "name": "11_prim_estimand_consistency",
+      "pass": true,
+      "detail": "Primary estimand and IUT test consistent across contract, causal ID, and SAP"
+    },
+    {
+      "name": "12_required_artifacts",
+      "pass": true,
+      "detail": "28 entries in index, expected 28"
+    }
+  ],
+  "errors": [],
+  "warnings": []
+}
