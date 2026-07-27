@@ -69,20 +69,26 @@
 - [x] go_states, no_go_states, inconclusive_states
 - [x] artifact_schema, source_hash, config_hash, environment_record, no_overwrite_policy, resource_policy
 
-## Gaps Remaining (DRAFT-2)
+## Gaps Remaining (DRAFT-3 FREEZE-CANDIDATE)
 
-1. **Implementation specs (D9-D10)**: Full experiment cards and per-file migration plan still in draft form. PARTIAL status.
-2. **Reproducibility & resource (D12-D13)**: Subprocess isolation and training step counts need final specification. PARTIAL status.
-3. **GPU smoke benchmarks**: Throughput model requires actual GPU execution (FORBIDDEN until contract freeze).
-4. **Calibration variance data**: Power analysis requires calibration run results (FORBIDDEN until contract freeze).
-5. **Reviewer scores**: Simulation scores are plausible estimates, not empirically calibrated.
+**All 34 artifacts COMPLETE. No PARTIAL items.**
 
-### Resolved from DRAFT-1
+### Remaining pre-implementation requirements
 
-1. ~~Prior 43 findings adjudication~~ → COMPLETE in `03_PRIOR_AUDIT_43_FINDINGS.md`
-2. ~~Literature search execution~~ → COMPLETE in `05_LITERATURE_AND_NOVELTY.md`
+1. **PI contract approval**: Scientific approval of `15_PM1_LEARNED_V2_CONTRACT.yaml` before V2 source implementation begins.
+2. **GPU smoke benchmarks**: Throughput model requires actual GPU execution (only after contract freeze).
+3. **Calibration variance data**: Power analysis requires calibration run results (only after contract freeze).
+4. **Reviewer scores**: Simulation scores are plausible estimates, not empirically calibrated.
+
+### Resolved from DRAFT-1 and DRAFT-2
+
+1. ~~Prior 43 findings adjudication~~ → COMPLETE
+2. ~~Literature search execution~~ → COMPLETE (20 searches, 15 included papers)
 3. ~~Untrained prevalence P0~~ → CONFIRMED via exact 128-example gate replication
-4. ~~Mathematical foundations~~ → COMPLETE with equivariance/Hodge/minimal-surgery corrections
-5. ~~Causal IUT logic~~ → COMPLETE in `07_CAUSAL_IDENTIFICATION.md`
-6. ~~Statistical all-null test~~ → COMPLETE in `08_STATISTICAL_ANALYSIS_PLAN.md`
-7. ~~Contract status tags~~ → COMPLETE in `15_PM1_LEARNED_V2_CONTRACT.yaml`
+4. ~~Mathematical foundations~~ → COMPLETE (equivariance, Hodge, C>1, minimal surgery)
+5. ~~Causal IUT logic~~ → COMPLETE (`max(p_f)`)
+6. ~~Statistical all-null test~~ → COMPLETE (10-family IUT, simulation-validated)
+7. ~~Contract status tags~~ → COMPLETE (all scalars tagged)
+8. ~~Null family identity across documents~~ → COMPLETE (10 families identical)
+9. ~~Diagnostic provenance~~ → COMPLETE (V1 constants imported, RNG audit, exact environment)
+10. ~~PARTIAL artifacts D9/D10/D12/D13~~ → COMPLETE (full experiment cards, implementation spec, reproducibility, resource plan)

@@ -18,11 +18,11 @@
 | D6 | `06_MATHEMATICAL_FOUNDATIONS.md` | COMPLETE | Equivariance, Hodge, minimal surgery, C>1 |
 | D7 | `07_CAUSAL_IDENTIFICATION.md` | COMPLETE | IUT logic, donor metrics, missingness |
 | D8 | `08_STATISTICAL_ANALYSIS_PLAN.md` | COMPLETE | IUT primary test, SESOI, missingness policy |
-| D9 | `09_EXPERIMENT_REGISTRY.md` | PARTIAL | Full experiment cards needed |
-| D10 | `10_IMPLEMENTATION_SPEC.md` | PARTIAL | Design corrections needed |
+| D9 | `09_EXPERIMENT_REGISTRY.md` | COMPLETE | 21 full experiment cards |
+| D10 | `10_IMPLEMENTATION_SPEC.md` | COMPLETE | Per-file migration, 6 new modules, dataclass specs |
 | D11 | `11_TEST_AND_TRACEABILITY.md` | COMPLETE | 20 new tests + existing mapping |
-| D12 | `12_REPRODUCIBILITY_AND_ARTIFACTS.md` | PARTIAL | Subprocess isolation, source hash pending |
-| D13 | `13_RESOURCE_SCHEDULE_AND_VOI.md` | PARTIAL | Training step count, stop conditions pending |
+| D12 | `12_REPRODUCIBILITY_AND_ARTIFACTS.md` | COMPLETE | Subprocess isolation, source hash, smoke gates |
+| D13 | `13_RESOURCE_SCHEDULE_AND_VOI.md` | COMPLETE | Training step count, throughput model, VOI |
 | D14 | `14_MANUSCRIPT_REVIEWER_AND_VENUE.md` | COMPLETE | Distill removed, conditional venue matrix |
 | D15 | `15_PM1_LEARNED_V2_CONTRACT.yaml` | COMPLETE | Status tags, IUT, SESOI, all families |
 | D16 | `16_OPEN_QUESTIONS_AND_DECISIONS.md` | COMPLETE | 10 PI decisions with recommendations |
@@ -47,8 +47,8 @@
 
 | Status | Count |
 |--------|------:|
-| COMPLETE | 30 |
-| PARTIAL | 4 |
+| COMPLETE | 34 |
+| PARTIAL | 0 |
 | BLOCKED | 0 |
 | NOT_STARTED | 0 |
 

@@ -1,8 +1,8 @@
 # PM1-LEARNED-V2 Master Plan
 
-**Status**: DRAFT-2 — NOT FROZEN
+**Status**: PLANNING-DRAFT-3 — FREEZE-CANDIDATE
 **Audit base commit**: `67b216bf05382c344425ea493119828412c5b3c5`
-**Planning commit**: `34d0adb969887d21ee16d6c4307f3ebb281c1cc7` (DRAFT-1, superseded)
+**Planning commit**: `a9c21ab` (DRAFT-3)
 
 ## Primary Scientific Question
 
@@ -22,30 +22,28 @@ Complete planning package at: [planning/PM1-LEARNED-V2/00_INDEX.md](planning/PM1
 
 ## Current P0 Blockers
 
-1. `defect_learned_not_innate` gate is structurally impassable (untrained prevalence → 1.0 under the `nonzero_defect` metric)
-2. V2 contract primary estimand excludes Fourier/PCA/harmonic/null families
-3. All-null statistical test uses invalid `min(p_f)` instead of IUT `max(p_f)`
-4. C>1 channelwise charge is not a genuine topological invariant (\(\pi_1(S^{2C-1})=0\))
-5. Existing `transplant_vortex` identified incorrectly as minimal surgery
+- ~~`defect_learned_not_innate` gate~~ → **REMOVED** (replaced with analyzable-stable-topology gate)
+- ~~Contract primary estimand excludes Fourier/PCA/harmonic~~ → **FIXED** (all 10 families included)
+- ~~All-null statistical test uses `min(p_f)`~~ → **FIXED** (IUT with `max(p_f)`)
+- ~~C>1 channelwise charge is not a genuine topological invariant~~ → **DOCUMENTED** (C=1 gateway strategy)
 
 ## Implementation Status
 
-- **Scientific V2 source code**: FORBIDDEN (contract not frozen)
+- **Planning**: FREEZE-CANDIDATE (all 34 artifacts COMPLETE, all 5 validator layers PASS)
+- **Scientific V2 source code**: AWAITING PI APPROVAL
 - **V1 source code**: IMMUTABLE
-- **GPU training**: FORBIDDEN
-- **CPU planning diagnostics only**: ALLOWED
+- **GPU training**: AWAITING CONTRACT FREEZE
 
 ## Freeze Checklist
 
-Before V2 implementation can begin:
-
-- [ ] 43 prior findings individually adjudicated
-- [ ] All diagnostic results reproducible from committed scripts
-- [ ] Exact 128-example untrained gate replication completed
-- [ ] Mathematical equivariance/readout analysis corrected
-- [ ] Primary IUT statistical test frozen
-- [ ] All comparable null families in primary estimand
-- [ ] Contract status tags resolved (UNFROZEN_CALIBRATION vs FROZEN)
-- [ ] Literature search actually executed
-- [ ] Plan validator passes all checks
+- [x] 43 prior findings individually adjudicated
+- [x] All diagnostic results reproducible from committed scripts
+- [x] Exact 128-example untrained gate replication completed
+- [x] Mathematical equivariance/readout analysis corrected
+- [x] Primary IUT statistical test frozen (`max(p_f)`)
+- [x] All comparable null families in primary estimand (10 families)
+- [x] Contract status tags resolved
+- [x] Literature search executed
+- [x] Plan validator passes all 5 layers
+- [x] All 34 artifacts COMPLETE (0 PARTIAL)
 - [ ] PI approval of contract
