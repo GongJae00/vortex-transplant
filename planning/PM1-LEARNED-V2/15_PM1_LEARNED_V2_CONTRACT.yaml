@@ -20,21 +20,39 @@ commits:
       rationale: >
         The commit at which the codebase was inspected to ground this design.
         Identical to the README's documented "target commit" for PM1-LEARNED-V2
-        planning.  Does NOT change after planning freeze.
+        planning. Does NOT change after planning freeze.
       sensitivity_analysis: >
         If the base implementation differs materially from this commit (e.g.,
         git-tree divergence due to concurrent work), the contract must be
         re-baselined before calibration begins.
-  planning_commit:
+  planning_content_digest:
+    value: "sha256(sorted(planning/PM1-LEARNED-V2/**/*))"
+    status: FROZEN_ENGINEERING
+    rationale: >
+      Content-addressable digest over all sorted planning files. Immutable
+      after planning freeze; captures the full planning state independently of
+      any particular VCS commit.
+    sensitivity_analysis: >
+      If any planning file is modified post-freeze, the digest changes and
+      all downstream commits are invalidated. A new planning digest must be
+      recorded.
+  planning_release_ref:
+    value: "external tag (e.g., 'planning/PM1-LEARNED-V2-v1.0')"
+    status: UNFROZEN_CALIBRATION
+    calibration_method: "Tag created when planning freeze is declared"
+    freeze_condition: "Planning freeze declared; tag pushed to remote"
+  runtime_commit_capture:
     sha:
-      value: "34d0adb"
-      status: FROZEN_ENGINEERING
+      status: UNFROZEN_CALIBRATION
+      calibration_method: "git rev-parse HEAD recorded at experiment execution time"
+      freeze_condition: "Recorded automatically at runtime; never pre-populated"
       rationale: >
-        The commit at which the PM1-LEARNED-V2 planning artifacts were
-        authored.  Immutable after planning freeze.
+        Captures the actual commit at which each experiment (calibration or
+        confirmatory) was executed. Populated at runtime, not embedded in
+        the planning contract.
       sensitivity_analysis: >
-        If planning documents are corrected post-freeze, a new planning commit
-        must be recorded and all downstream commits invalidated.
+        Must be recorded alongside each experimental run's artifact bundle;
+        dirty working tree is not permitted (see source_hash).
   implementation_commit:
     sha:
       status: UNFROZEN_CALIBRATION
@@ -83,10 +101,10 @@ secondary_hypotheses:
     text: "Vortex effect persists at OOD delay=64"
   - id: training_vs_untrained
     text: >
-      Trained-model vortex margin > untrained-model vortex margin (two-sided
+      Trained-model vortex margin vs. untrained-model vortex margin (two-sided
       secondary: tests whether vortex causal effects are learned vs.
-      architectural artifacts).  Rejection in the opposite direction
-      (untrained ≥ trained) would constitute evidence against the learned
+      architectural artifacts). Rejection in the direction
+      untrained ≥ trained would constitute evidence against the learned
       mechanism claim.
   - id: charge_arrangement_superiority
     text: "Vortex margin > charge_arrangement_shuffle margin (charge is positional, not merely combinatorial)"
@@ -126,7 +144,7 @@ calibration_split:
     rationale: "Explicit namespace separation for calibration experiments; mirrors V1 convention."
     sensitivity_analysis: >
       If calibration runs are reused as confirmatory (e.g., due to seed collision),
-      the confirmatory Type-I error rate is inflated.  Hash-separated namespaces
+      the confirmatory Type-I error rate is inflated. Hash-separated namespaces
       prevent this at the code level.
   seed_count:
     status: UNFROZEN_CALIBRATION
@@ -156,9 +174,8 @@ confirmatory_split:
     calibration_method: "Simulation-based power analysis using calibration variance estimates"
     freeze_condition: >
       Power ≥ 0.80 for the smallest effect size of scientific interest (SESOI).
-      SESOI is defined as the minimum vortex-over-max-null advantage that would
-      be considered scientifically meaningful, set by PI after reviewing
-      calibration effect-size distributions.
+      SESOI is defined as the minimum scientifically meaningful vortex-over-max-null
+      advantage, set by PI after reviewing calibration effect-size distributions.
   seed_generation_rule:
     value: "Hash-separated, incremental from 0, prefix 'confirm'"
     status: FROZEN_ENGINEERING
@@ -352,7 +369,7 @@ training_conditions:
     rationale: "V1 training budget; sufficient for copy-task convergence on 16×16 torus."
     sensitivity_analysis: >
       Undertraining may produce unconverged models (false negative);
-      overtraining may mask topology.  C05 addresses convergence empirically.
+      overtraining may mask topology. C05 addresses convergence empirically.
   batch_size:
     value: 64
     status: FROZEN_ENGINEERING
@@ -452,27 +469,27 @@ order_parameter:
       status: FROZEN_MATHEMATICAL
       rationale: >
         For C=1, the complex field z(x) ∈ ℂ\{0} has φ(x) = arg(z(x)) as the
-        unique angular order parameter.  The fundamental group π₁(ℂ\{0}) = ℤ
+        unique angular order parameter. The fundamental group π₁(ℂ\{0}) = ℤ
         guarantees integer winding numbers.
       sensitivity_analysis: >
-        The phase is undefined at z(x) = 0 (magnitude zero).  The
-        minimum-magnitude filter (1e-8) excludes these points.  Near-zero
+        The phase is undefined at z(x) = 0 (magnitude zero). The
+        minimum-magnitude filter excludes these points. Near-zero
         magnitudes may produce numerically unstable phase; the branch-margin
         check quantifies this.
     required_input_condition:
       status: FROZEN_ENGINEERING
       rationale: >
         C=1 analysis requires that the hidden state field has strictly positive
-        magnitude everywhere and is free of net topological charge on the torus.
+        magnitude everywhere and is charge-free on every plaquette.
         This ensures the Hodge decomposition is well-defined and the vortex
         extraction does not encounter degenerate (zero-magnitude) lattice points.
       sensitivity_analysis: >
         If the model produces near-zero magnitude states, the magnitude filter
-        excludes those examples from analysis.  Excessive exclusion (>20%)
+        excludes those examples from analysis. Excessive exclusion (>20%)
         triggers INCONCLUSIVE_MANIFOLD.
       conditions:
         - "min(|z(x)|) > 1e-8 for all lattice points x"
-        - "net_charge(z) = 0 on torus (∑_p Q_p = 0)"
+        - "Q_p = 0 for ALL plaquettes p (not merely sum(Q_p) = 0, which allows vortex-antivortex pairs)"
         - "smooth embedding exists: can construct a charge-free smooth field matching the original phase modulo singular components"
   c_greater_1:
     status: UNFROZEN_CALIBRATION
@@ -491,7 +508,7 @@ order_parameter:
         the analysis defaults to the C=1 scalar field.
       sensitivity_analysis: >
         C=1 results do NOT generalize to C>1 without explicit phase-locking
-        validation.  C=1 failure does NOT automatically authorize C=8 fallback;
+        validation. C=1 failure does NOT automatically authorize C=8 fallback;
         a C=1 failure would require redesign before attempting C>1.
       policy: "C=1 scalar gateway (scalar field with 1 channel)"
 
@@ -502,45 +519,54 @@ topology_definition:
       status: FROZEN_MATHEMATICAL
       rationale: >
         The lattice curl of link variables (phase differences) divided by 2π
-        gives the integer winding number around each plaquette.  The rounding
+        gives the integer winding number around each plaquette. The rounding
         operator enforces integrality up to numerical tolerance.
       sensitivity_analysis: >
-        The rounding step is sensitive to the tolerance value.  If tolerance is
+        The rounding step is sensitive to the tolerance value. If tolerance is
         too large, near-half-integer phases may be misclassified; if too small,
         floating-point noise may produce non-integer charges.
     tolerance:
       value: 1.0e-10
-      status: FROZEN_ENGINEERING
+      status: UNFROZEN_ENGINEERING
       rationale: >
-        1e-10 is 6 orders of magnitude below double-precision machine epsilon (~2e-16)
-        for values near 2π, providing comfortable separation from numerical noise
-        while being far below any physically meaningful phase deviation.
+        1e-10 is ~6 orders of magnitude ABOVE double-precision machine epsilon
+        (~2e-16), not below. This tolerance validates residuals after rounding
+        and does NOT merge distinct charge classes. It is a numerical sanity
+        check, not a charge-coarsening parameter.
       sensitivity_analysis: >
-        Increasing tolerance to 1e-6 may merge distinct charges in noisy fields.
-        The branch-margin analysis (C04) validates that this tolerance is not
-        a binding constraint for trained models.
+        Reducing tolerance below 1e-12 risks flagging floating-point roundoff
+        as charge misclassification. Increasing tolerance beyond 1e-8 risks
+        merging physically distinct vortex configurations. The branch-margin
+        analysis (C04) validates that this tolerance does not exclude
+        valid topological states.
   net_charge:
     value: "must be zero on torus"
     status: FROZEN_MATHEMATICAL
     rationale: >
-      On a compact orientable 2-manifold without boundary (T²), the net
-      topological charge must be zero by the Gauss–Bonnet/Chern theorem.
-      Nonzero net charge indicates a measurement or definition error.
+      By discrete telescoping of periodic plaquette curl, the sum of all
+      plaquette charges on a toroidal lattice vanishes exactly:
+      Σ_{p} q_p = Σ_{p} (1/2π) Δ × Δθ = 0 because each directed edge
+      appears twice with opposite orientation in the telescoping sum over
+      the torus. Nonzero net charge indicates an implementation error
+      in the charge extraction algorithm.
     sensitivity_analysis: >
       If net charge is consistently nonzero, the charge extraction algorithm
       is incorrect, not the physics.
   valid_channel:
     magnitude_threshold:
       value: 1.0e-8
-      status: FROZEN_ENGINEERING
+      status: UNFROZEN_CALIBRATION
+      calibration_method: "Empirical magnitude distribution analysis from C01–C04 diagnostics"
+      freeze_condition: "Threshold validated against empirical magnitude quantile distribution"
       rationale: >
-        1e-8 is the standard "near-zero" cutoff for float32 computations.
-        Magnitudes below this threshold indicate near-degenerate lattice
-        points where the phase (and thus charge) is ill-defined.
+        1e-8 is NOT a universal float32 cutoff. It is an engineering choice
+        for the minimum allowed field magnitude. V1 uses 1e-6, which is 100×
+        larger. The final threshold must be calibrated against the empirical
+        magnitude distribution of trained-model hidden states.
       sensitivity_analysis: >
-        A higher threshold (e.g., 1e-6) would exclude more states, reducing
-        sample size.  A lower threshold (e.g., 1e-12) would admit
-        numerically unstable phases.  The fraction of excluded states is
+        A higher threshold (e.g., 1e-6, matching V1) would exclude more
+        states, reducing sample size. A lower threshold (e.g., 1e-12) would
+        admit numerically unstable phases. The fraction of excluded states is
         monitored as a diagnostic.
 
 # ── Branch Stability Definition ──
@@ -551,11 +577,14 @@ branch_stability_definition:
       status: FROZEN_MATHEMATICAL
       rationale: >
         The edge margin is the distance from the branch cut (|Δθ| = π) for a
-        given lattice edge.  Large positive margin indicates the edge is far
-        from the cut; small or negative margin indicates the edge is near or
-        across the branch cut, where the phase difference is ambiguous.
+        given lattice edge. When Δθ_e is the principal phase difference
+        in (−π, π], the edge margin lies in [0, π]. It CANNOT be negative,
+        because |Δθ_e| ≤ π by definition of the principal branch.
+        Large positive margin indicates the edge is far from the branch cut;
+        margin near zero indicates the edge is near the branch cut, where
+        the phase difference is ambiguous.
       sensitivity_analysis: >
-        The margin is defined in [0, π].  The distribution of margins across
+        The margin is defined in [0, π]. The distribution of margins across
         all edges in a field determines topological stability.
   metrics:
     - "global_minimum"
@@ -574,7 +603,7 @@ analyzable_stable_topology_gate:
   status: FROZEN_ENGINEERING
   rationale: >
     Before any causal analysis, the topology of the hidden state must be
-    well-defined and numerically stable.  This is a specific, measurable
+    well-defined and numerically stable. This is a specific, measurable
     precondition for topological analysis; without it, vortex charges,
     branch cuts, and Hodge components are unreliable.
   sensitivity_analysis: >
@@ -591,9 +620,9 @@ analyzable_stable_topology_gate:
     - name: "net_charge_zero"
       description: "Net charge is zero on all channels"
       status: FROZEN_MATHEMATICAL
-      rationale: "Topological necessity on T²."
+      rationale: "Topological necessity on T² by discrete telescoping of plaquette curl."
     - name: "minimum_magnitude"
-      description: "min(|field|) > 1e-8 for all lattice points"
+      description: "min(|field|) > magnitude_threshold for all lattice points"
       status: FROZEN_ENGINEERING
       rationale: "Phase undefined at zero magnitude."
     - name: "decomposition_fidelity"
@@ -622,28 +651,69 @@ hodge_definition:
         corresponding to the two independent global winding numbers
         (holonomies around the two torus cycles).
   decomposition_method:
-    value: "FFT-based Poisson solver (existing in canonical_vortex_field)"
+    value: "FFT-based Poisson solver"
     status: FROZEN_ENGINEERING
     rationale: "Spectral method provides numerically exact decomposition on periodic lattice."
     sensitivity_analysis: "Alternative methods (finite-difference, iterative) would produce identical results up to numerical tolerance."
+  implementation_scope:
+    status: FROZEN_ENGINEERING
+    rationale: >
+      The existing canonical_vortex_field function produces ONLY the
+      coexact (canonical vortex) component. The exact, harmonic, and
+      branch integer components are NOT separately extracted by the
+      current implementation. Full Hodge decomposition into all four
+      components requires additional implementation work (C02, C03).
+    sensitivity_analysis: >
+      If the full Hodge decomposition is not implemented, the harmonic_swap
+      intervention arm cannot be executed, and the charge_arrangement_shuffle
+      null family is restricted to exact-component structure only.
 
 # ── Representative Definition ──
 representative_definition:
   same_charge_class:
     description:
-      value: "all fields g with Q(g) = 0 (smooth, charge-free)"
+      value: "all fields g with Q_p(g) = 0 for ALL plaquettes p (not merely sum(Q_p) = 0)"
       status: FROZEN_MATHEMATICAL
-      rationale: "Representatives are gauge choices within the same topological sector; Q=0 fields form the reference class."
+      rationale: >
+        Every plaquette must be individually charge-free. Sum(Q_p)=0 is
+        insufficient because it admits vortex-antivortex pairs which are
+        NOT charge-free states. Representatives are gauge choices within
+        the Q=0-everywhere topological sector.
+    representative_cases:
+      status: FROZEN_MATHEMATICAL
+      rationale: >
+        Three distinct cases must be accounted for in representative design.
+        Conflating them misattributes variance to charge vs. representative
+        when the true source is harmonic-module selection.
+      cases:
+        - case_a:
+            description: >
+              Same local charge + same harmonic sector + alternate smooth
+              representative. Tests whether a different gauge-equivalent
+              charge-free field (same harmonic module) produces the same
+              causal effect. Variance here is representative noise.
+        - case_b:
+            description: >
+              Same local charge + different harmonic sector. Tests whether
+              the global holonomy (torus winding) matters for the causal
+              effect. Variance here is harmonic-mismatch, not
+              representative failure.
+        - case_c:
+            description: >
+              Different local charge + same harmonic sector. Tests whether
+              a different topological sector (nonzero charge) with matched
+              global winding produces a different effect. This is the
+              primary charge-vs-null contrast.
   representatives_per_sample:
     value: 10
     status: FROZEN_ENGINEERING
     rationale: >
       10 representatives per sample provide a stable estimate of within-charge-class
-      variance.  Bootstrap SE of variance estimates stabilizes around n=10 for
+      variance. Bootstrap SE of variance estimates stabilizes around n=10 for
       moderate-effect-size regimes.
     sensitivity_analysis: >
       Fewer representatives (e.g., 5) inflate variance estimate uncertainty;
-      more (e.g., 20) increase compute linearly.  The representative-variance
+      more (e.g., 20) increase compute linearly. The representative-variance
       fraction is reported with bootstrap CI to quantify estimation uncertainty.
   representative_axis:
     value: "harmonic_random (random harmonic sector)"
@@ -678,7 +748,7 @@ manifold_definition:
         (~1–2 steps empirically from V1 diagnostics).
       sensitivity_analysis: >
         More steps (e.g., 20) may over-relax and erase the transplant signal;
-        fewer steps (e.g., 2) may be insufficient.  The relaxation convergence
+        fewer steps (e.g., 2) may be insufficient. The relaxation convergence
         is monitored in C11.
     method:
       value: "Autonomous recurrence F (blank transition)"
@@ -695,16 +765,17 @@ charge_free_positive_magnitude_smooth_embedding:
   status: FROZEN_ENGINEERING
   rationale: >
     The Hodge decomposition and vortex extraction require the field to be a
-    smooth, charge-free, everywhere-positive-magnitude embedding.  Without this
-    condition, the decomposition is ill-defined and vortex charges are unreliable.
+    smooth, charge-free-on-EVERY-plaquette, everywhere-positive-magnitude embedding.
+    Without this condition, the decomposition is ill-defined and vortex charges
+    are unreliable.
   sensitivity_analysis: >
     If this condition cannot be met for a given model state, that state is
-    excluded from all topological analyses.  Exclusion rate is reported.
+    excluded from all topological analyses. Exclusion rate is reported.
   conditions:
     - name: "charge_free"
-      description: "∑_p Q_p = 0 on torus"
+      description: "Q_p = 0 for ALL plaquettes p. NOT merely sum(Q_p) = 0, which allows vortex-antivortex pairs."
     - name: "positive_magnitude"
-      description: "min(|z(x)|) > 1e-8 for all x"
+      description: "min(|z(x)|) > magnitude_threshold for all x"
     - name: "smooth_embedding"
       description: "Field is C¹ on the lattice (no discontinuities exceeding branch margin tolerance)"
 
@@ -724,7 +795,7 @@ recipient_selection:
       near-chance behavior; higher thresholds (e.g., 0.99) may exclude
       too many examples and reduce sample size.
   minimum_magnitude:
-    value: 1.0e-8
+    value: "see topology_definition.valid_channel.magnitude_threshold"
     status: FROZEN_ENGINEERING
     rationale: "Same as topology_definition.valid_channel.magnitude_threshold."
     sensitivity_analysis: "See magnitude_threshold sensitivity."
@@ -759,9 +830,9 @@ selection_funnel:
     - name: "accuracy_filter"
       description: "recipient accuracy ≥ 0.95"
     - name: "magnitude_filter"
-      description: "min(|field|) > 1e-8"
+      description: "min(|field|) > magnitude_threshold"
     - name: "charge_filter"
-      description: "net_charge == 0 on all channels"
+      description: "Q_p = 0 for ALL plaquettes p on all channels"
     - name: "decomposition_filter"
       description: "reconstruction_error < 1e-10"
     - name: "donor_filter"
@@ -797,7 +868,7 @@ intervention_families:
   null_families:
     status: FROZEN_ENGINEERING
     rationale: >
-      Each null family tests a distinct counterfactual.  They MUST NOT be pooled.
+      Each null family tests a distinct counterfactual. They MUST NOT be pooled.
       The primary estimand uses ALL families listed below.
     sensitivity_analysis: >
       Dropping any null family weakens the mechanism-specificity claim.
@@ -833,19 +904,21 @@ c1_strategy:
   status: FROZEN_ENGINEERING
   rationale: >
     C=1 (scalar complex field) is the first mathematically clean causal system
-    for testing vortex transplant effects.  With C=1, the order parameter is
-    uniquely arg(z), π₁ = ℤ, and every plaquette charge is a genuine topological
-    invariant.  C=8 (multichannel) is an extension that requires phase-locking
+    for testing vortex transplant effects. With C=1, the order parameter is
+    uniquely arg(z), π₁ = ℤ, and C=1 supplies a scalar complex order parameter
+    whose winding is homotopically meaningful under nonzero-magnitude and
+    admissibility conditions; discrete plaquette charges remain branch-margin
+    dependent. C=8 (multichannel) is an extension that requires phase-locking
     validation and introduces channel-mode ambiguity.
   sensitivity_analysis: >
     C=1 failure (cannot achieve 90% validation accuracy) does NOT automatically
-    authorize C=8 fallback.  A C=1 failure would mean the model cannot solve the
+    authorize C=8 fallback. A C=1 failure would mean the model cannot solve the
     task with a single scalar complex channel, which raises fundamental questions
     about the relationship between channel count and task complexity that require
     separate investigation before C=8 analysis is meaningful.
   escalation_policy: |
     Gate order: C=1 → C=1 topology verification → C=8 (only if C=1 succeeds)
-    - C=1 failure: STOP.  Redesign model or task before considering C>1.
+    - C=1 failure: STOP. Redesign model or task before considering C>1.
     - C=1 success + topology verified: Proceed to causal analysis.
     - C=1 success + C>1 extension: ONLY if C=1 results are positive and phase-locking (C14) validates multichannel topology.
   required_input_condition_ref: "charge_free_positive_magnitude_smooth_embedding"
@@ -857,11 +930,11 @@ training_vs_untrained_analysis:
     Distinguishes learned vortex effects from architectural artifacts.
     If vortex transplant effects appear in untrained (randomly-initialized)
     models of the same architecture, the causal effect is an architectural
-    property, not a learned one.  This is a critical negative control for
+    property, not a learned one. This is a critical negative control for
     the mechanism claim.
   sensitivity_analysis: >
     If untrained models fail the analyzable-stable-topology gate, the
-    comparison is undefined (no topology to analyze).  This would be
+    comparison is undefined (no topology to analyze). This would be
     reported as "topology is a training-emergent property" and strengthens
     the learning claim without requiring a quantitative comparison.
   design:
@@ -870,12 +943,35 @@ training_vs_untrained_analysis:
       status: FROZEN_ENGINEERING
       rationale: >
         Two-sided test because either direction is informative:
-        trained > untrained supports learning; untrained ≥ trained suggests
-        architectural artifact and weakens the mechanism claim.
+        trained ≠ untrained is the scientific question. The contract
+        does NOT pre-specify "trained > untrained" as a required
+        direction because the question is whether vortex causal effects
+        are learned, not whether training monotonically increases
+        some effect magnitude.
     null_hypothesis:
       value: "trained_margin = untrained_margin"
       status: FROZEN_ENGINEERING
       rationale: "Standard null for two-sided comparison."
+    controls:
+      topology_controls:
+        status: FROZEN_ENGINEERING
+        rationale: >
+          Untrained models provide topology baseline controls:
+          prevalence, density, branch stability. These establish
+          whether well-defined topology exists at initialization.
+        metrics:
+          - "defect prevalence (metrics from metric_definitions.py)"
+          - "site density (signed_site_count / (C×H×W))"
+          - "charge unit density (absolute_charge_units / (C×H×W))"
+          - "branch margin distribution quantiles"
+      behavioral_controls:
+        status: FROZEN_ENGINEERING
+        rationale: >
+          Task-competent baseline models (e.g., PlainConvRNN at matched
+          accuracy) provide behavioral comparison. The critical contrast
+          is: does a U(1)-equivariant model show vortex-specific causal
+          effects beyond what any task-competent model of comparable
+          architecture shows?
     models:
       trained:
         value: "U1ConvRNN after 30k updates"
@@ -901,34 +997,63 @@ training_vs_untrained_analysis:
 # ── Estimands ──
 primary_estimand:
   name:
-    value: "mechanism_advantage"
-    status: FROZEN_ENGINEERING
-    rationale: "Core scientific quantity: how much more does vortex transplant shift behavior than the strongest null perturbation?"
-  formula:
-    value: >
-      vortex_margin − max(
-        smooth_margin,
-        magnitude_margin,
-        global_phase_margin,
-        zero_charge_phase_margin,
-        fourier_low_margin,
-        fourier_high_margin,
-        pca_margin,
-        random_direction_margin,
-        harmonic_margin,
-        charge_arrangement_shuffle_margin
-      )
+    value: "per_family_seed_level_contrast"
     status: FROZEN_ENGINEERING
     rationale: >
-      The max over ALL comparable null families provides the strictest
-      mechanism-specificity test.  All 10 null families must be included;
-      excluding any (e.g., Fourier, PCA, harmonic) weakens the
-      mechanism-specificity claim.
-    sensitivity_analysis: >
-      Using the mean instead of max would be a weaker test (a strong null in
-      one family could be "averaged out" by weak nulls in others).  The max
-      requires vortex to beat EVERY null family, which is the correct
-      mechanism-specificity standard.
+      Core scientific quantity: for each null family f, what is the expected
+      seed-level advantage of vortex transplant over null-family-f? The
+      IUT tests the intersection over all families.
+  per_family_contrast:
+    formula:
+      value: "D_{s,f} = Aggregate_{(r,d)} [M_{v,s,r,d} − M_{f,s,r,d}]"
+      status: FROZEN_ENGINEERING
+      rationale: >
+        Per-family, per-seed contrast: for each seed s and null family f,
+        average the vortex-minus-null margin over all valid recipient-donor
+        pairs (r,d). M denotes the outcome metric (log-likelihood difference
+        in nats). Aggregate is mean over pairs within each seed.
+      sensitivity_analysis: >
+        Different aggregation functions (median, trimmed mean) would
+        produce different D_{s,f} distributions. Mean is standard and
+        interpretable as expected margin advantage.
+    parameters:
+      delta_f:
+        value: "δ_f = E_s[D_{s,f}]"
+        status: FROZEN_ENGINEERING
+        rationale: "Expected seed-level vortex-over-null-f advantage."
+    hypotheses:
+      null_f:
+        value: "H_{0,f}: δ_f ≤ Δ_f^min"
+        status: FROZEN_ENGINEERING
+        rationale: "Null: vortex advantage ≤ minimum scientifically meaningful effect for family f."
+      alternative_f:
+        value: "H_{1,f}: δ_f > Δ_f^min"
+        status: FROZEN_ENGINEERING
+        rationale: "Alternative: vortex advantage exceeds Δ_f^min for family f."
+    iut_decision:
+      rule:
+        value: "reject if max_f(p_f) ≤ α"
+        status: FROZEN_ENGINEERING
+        rationale: >
+          IUT requires rejection of EVERY individual null. max(p_f) ≤ α
+          is the correct rejection rule for the intersection hypothesis
+          ∩_f H_{1,f}. DO NOT use E[V − max N] as the primary test
+          statistic; the intersection structure requires per-family
+          estimation and testing, not a single pooled contrast.
+        sensitivity_analysis: >
+          Pooling all nulls into a single max-N reference would mask
+          which null family drives failure, making the mechanism-specificity
+          claim untestable.
+  descriptive_summary:
+    formula:
+      value: "A_worst = min_f(δ̂_f − Δ_f^min)"
+      status: DESCRIPTIVE
+      derivation: "Smallest estimated advantage over any null family."
+      rationale: >
+        Descriptive statistic summarizing the weakest link in the mechanism
+        specificity chain. If A_worst > 0, all point estimates exceed their
+        respective Δ_f^min. If A_worst ≤ 0, at least one null family's
+        estimated advantage fails to clear its threshold.
   unit:
     value: "log-likelihood difference (nats)"
     status: FROZEN_ENGINEERING
@@ -960,7 +1085,7 @@ secondary_estimands:
           rationale: "10% threshold: if >10% of pairs in a seed have negative denominators, the seed has systemic directional failure."
           sensitivity_analysis: >
             Lower threshold (e.g., 5%) may flag noise; higher (e.g., 20%)
-            may miss systemic failures.  10% is conservative for directional
+            may miss systemic failures. 10% is conservative for directional
             sanity checking.
         action: "FLAG seed as FAILED_DIRECTIONAL_SANITY if >10% of pairs fail"
       recovery_over_1:
@@ -987,7 +1112,7 @@ validity_metrics:
         rationale: "Topological necessity on T²."
     - name: "minimum_magnitude"
       threshold:
-        value: "> 1e-8"
+        value: "> magnitude_threshold"
         status: FROZEN_ENGINEERING
         rationale: "Phase well-defined only for nonzero magnitude."
     - name: "branch_margin_q01"
@@ -1014,32 +1139,73 @@ normalization_edge_cases:
     status: FROZEN_ENGINEERING
     rationale: "Vortex > whole_state is possible but requires explanation."
 
+# ── SESOI (Smallest Effect Size of Scientific Interest) ──
+sesoi:
+  status: UNFROZEN_CALIBRATION
+  calibration_method: "PI domain judgment informed by calibration effect-size distributions"
+  freeze_condition: >
+    PI declares, before seeing confirmatory results: "A mean vortex-over-f
+    advantage below Δ_f^min nats per position would not constitute an
+    interesting finding."
+  definition:
+    value: "Smallest scientifically meaningful normalized recovery fraction"
+    status: UNFROZEN_CALIBRATION
+    calibration_method: "Review of calibration normalized_recovery distributions"
+    freeze_condition: "PI sets SESOI before confirmatory execution"
+  candidate:
+    value: "0.1 × whole_state_recovery"
+    status: UNFROZEN_CALIBRATION
+    calibration_method: "Calibration whole_state_recovery mean as anchor"
+    freeze_condition: "PI approval; must NOT be derived from observed vortex effect"
+  anti_patterns:
+    - "Do NOT set SESOI = 0.5 × calibration vortex effect"
+    - "Do NOT derive SESOI from max null family margin"
+    - "Do NOT set Δ_f^min from the observed calibration contrast"
+
 # ── Statistical Tests ──
 primary_statistical_test:
   method:
     value: "intersection_union_test"
-    status: FROZEN_ENGINEERING
+    status: UNFROZEN_CALIBRATION
+    calibration_method: "simulation-based Type-I error validation (see tools/run_statistical_method_simulation.py)"
+    freeze_condition: "Simulation confirms Type-I error ≤ α under full H_0 with realistic covariance structure"
     rationale: >
       The scientific claim is "vortex beats ALL null families simultaneously."
       The IUT is the natural test for this union-of-nulls structure:
       H₀ = ∪_f H₀_f (vortex fails to beat at least one null family),
       H₁ = ∩_f H₁_f (vortex beats every null family).
       The IUT rejects H₀ iff every individual test rejects at level α,
-      i.e., max_f(p_f) ≤ α.  Each individual test is at level α (no
+      i.e., max_f(p_f) ≤ α. Each individual test is at level α (no
       Bonferroni correction), and the global test size is bounded by α.
     sensitivity_analysis: >
       Using min(p_f) would test the wrong hypothesis (vortex beats at least
-      ONE null family).  Using Bonferroni would be overly conservative for
+      ONE null family). Using Bonferroni would be overly conservative for
       the IUT global assertion (Bonferroni corrects for the union, not the
-      intersection).  The IUT is the correct and efficient test for
+      intersection). The IUT is the correct and efficient test for
       intersection hypotheses.
+    per_family_method:
+      status: UNFROZEN_CALIBRATION
+      calibration_method: "simulation-based Type-I error validation (see tools/run_statistical_method_simulation.py)"
+      freeze_condition: "Method with best Type-I error control and power trade-off selected"
+      candidate_methods:
+        - name: "hierarchical_bootstrap_percentile"
+          description: "Seed-level resampling, one-sided percentile bootstrap p-value"
+          status: UNFROZEN_CALIBRATION
+        - name: "hierarchical_bootstrap_studentized"
+          description: "Seed-level resampling, studentized pivot (BCa optional)"
+          status: UNFROZEN_CALIBRATION
+        - name: "paired_t_with_wild_bootstrap"
+          description: "Wild bootstrap for paired within-seed structure"
+          status: UNFROZEN_CALIBRATION
+      calibration_method: "simulation-based Type-I error validation"
+      freeze_condition: "Method validated at nominal level under H_0 simulation"
   individual_tests:
     status: FROZEN_ENGINEERING
     rationale: >
       Each null family f ∈ F is tested individually:
-      H₀_f: vortex_margin ≤ null_f_margin
-      H₁_f: vortex_margin > null_f_margin
-      Test: hierarchical bootstrap, one-sided, level α.
+      H₀_f: δ_f ≤ Δ_f^min
+      H₁_f: δ_f > Δ_f^min
+      Test: per-family method (UNFROZEN_CALIBRATION), one-sided, level α.
     families:
       - "smooth"
       - "magnitude"
@@ -1061,7 +1227,7 @@ primary_statistical_test:
       status: FROZEN_ENGINEERING
       rationale: >
         IUT rejection rule: reject the global null iff every individual
-        null is rejected at level α.  Equivalently, max(p_f) ≤ α.
+        null is rejected at level α. Equivalently, max(p_f) ≤ α.
         NOT min(p_f) — that would test vortex > at least one null,
         which is the wrong hypothesis.
     alpha:
@@ -1081,20 +1247,12 @@ primary_statistical_test:
       status: FROZEN_ENGINEERING
       rationale: "Seed is the independent randomization unit."
       sensitivity_analysis: "Recipient-level bootstrap inflates effective n and anti-conservatively shrinks CIs."
-    ci_method:
-      value: "percentile"
-      status: FROZEN_ENGINEERING
-      rationale: "Percentile bootstrap CI is nonparametric and transformation-respecting."
-    ci_level:
-      value: 0.95
-      status: FROZEN_ENGINEERING
-      rationale: "Standard 95% CI; note that the IUT controls the global error rate at α, not the CI coverage."
 
 confidence_interval:
   type:
     value: "bootstrap_percentile"
     status: FROZEN_ENGINEERING
-    rationale: "Consistent with primary test method."
+    rationale: "Consistent with primary test method; reported for transparency alongside IUT decision."
   level:
     value: 0.95
     status: FROZEN_ENGINEERING
@@ -1103,6 +1261,42 @@ confidence_interval:
     value: false
     status: FROZEN_ENGINEERING
     rationale: "Two-sided CI reported for transparency; primary test is one-sided within IUT."
+
+# ── Cross-Model Comparison (U1 vs Plain) ──
+cross_model_comparison:
+  status: FROZEN_ENGINEERING
+  rationale: >
+    Paired U1-Plain contrast tests whether U(1)-equivariance specifically
+    produces larger vortex causal effects. Plain p > 0.05 does NOT prove
+    absence of a cross-model difference. An equivalence test option must
+    be provided.
+  design:
+    primary_test:
+      value: "paired bootstrap, one-sided: H_0: δ_U1 − δ_Plain ≤ 0"
+      status: FROZEN_ENGINEERING
+      rationale: "Tests whether U1 vortex effect exceeds Plain vortex effect."
+    equivalence_test:
+      status: UNFROZEN_CALIBRATION
+      calibration_method: "Set equivalence margin after calibration cross-model distributions"
+      freeze_condition: "PI sets cross-model SESOI"
+      rationale: >
+        If the one-sided test does not reject, an equivalence test
+        (two one-sided tests, TOST) with pre-specified cross-model
+        SESOI determines whether the difference is practically
+        negligible or merely underpowered.
+      candidate_cross_model_sesoi:
+        value: "0.1 × calibration whole_state_recovery"
+        status: UNFROZEN_CALIBRATION
+        calibration_method: "PI domain judgment; same anchor as primary SESOI"
+        freeze_condition: "PI sets cross-model SESOI before confirmatory"
+    seeder:
+      value: "Paired by seed index within model type"
+      status: FROZEN_ENGINEERING
+      rationale: "U1_seed_i and Plain_seed_i share the same input sequences."
+    multiplicity:
+      value: "Secondary, paired bootstrap, two-sided"
+      status: FROZEN_ENGINEERING
+      rationale: "Cross-model comparison is a secondary claim, not part of the primary IUT."
 
 null_draw_rule:
   per_family:
@@ -1129,7 +1323,7 @@ sample_size_rule:
   freeze_condition: >
     Power ≥ 0.80 for the smallest effect size of scientific interest (SESOI).
     SESOI is defined by PI after reviewing calibration effect-size distributions;
-    it represents the minimum vortex-over-max-null advantage that would be
+    it represents the minimum vortex-over-null-family advantage that would be
     considered scientifically meaningful, NOT 0.5 × calibration effect size.
   power_curve_required: true
 
@@ -1143,13 +1337,13 @@ multiplicity:
     status: FROZEN_ENGINEERING
     rationale: "Individual family tests are components of the IUT; their p-values inform which families drive rejection/failure, not multiplicity-adjusted inference."
   cross_model:
-    value: "Secondary, paired bootstrap, two-sided"
+    value: "Secondary, paired bootstrap, one-sided with equivalence option"
     status: FROZEN_ENGINEERING
     rationale: "Cross-model comparison is a secondary claim, not part of the primary IUT."
   untrained_comparison:
-    value: "Secondary, two-sided paired bootstrap (training-vs-untrained)"
+    value: "Secondary, two-sided paired bootstrap (trained-vs-untrained)"
     status: FROZEN_ENGINEERING
-    rationale: "Training-vs-untrained is a secondary analysis; separate from primary IUT."
+    rationale: "Trained-vs-untrained is a secondary analysis; separate from primary IUT."
   reporting:
     value: "All p-values reported, individual and global"
     status: FROZEN_ENGINEERING
@@ -1229,7 +1423,7 @@ inconclusive_states:
         the effect may rely on out-of-distribution perturbations.
       sensitivity_analysis: >
         Lower threshold (e.g., 10%) is more conservative; higher (e.g., 30%)
-        is more permissive.  20% balances sensitivity to manifold violations
+        is more permissive. 20% balances sensitivity to manifold violations
         against practical sample-size constraints.
     condition: ">20% of interventions off-manifold"
     action: "Improve manifold projection or accept limitation"
@@ -1251,7 +1445,7 @@ resource_policy:
     rationale: "RTX 5080 16 GB envelope minus 2 GB safety margin for CUDA context and OS overhead."
     sensitivity_analysis: >
       If the 14 GB limit is exceeded, the experiment may OOM on the target
-      hardware.  Reducing batch size or model size would be required.
+      hardware. Reducing batch size or model size would be required.
   wall_limit_hours:
     calibration:
       value: 48
@@ -1259,7 +1453,7 @@ resource_policy:
       rationale: >
         48 hours is adequate for all 16 calibration experiments on a single
         RTX 5080, assuming ~2 GPU-hours for training (C05, C16) and the
-        remainder for analysis.  Two calendar days provides scheduling slack.
+        remainder for analysis. Two calendar days provides scheduling slack.
       sensitivity_analysis: >
         If calibration exceeds 48 hours, the experiment pipeline should be
         profiled for bottlenecks before requesting additional time.
@@ -1269,12 +1463,12 @@ resource_policy:
       status: FROZEN_ENGINEERING
       rationale: >
         168 hours (one week) is adequate for confirmatory runs at up to 100
-        seeds with the full intervention catalog.  Training dominates; each
+        seeds with the full intervention catalog. Training dominates; each
         seed requires ~30 min on GPU (30k updates × batch 64).
       sensitivity_analysis: >
         100 seeds × 30 min ≈ 50 GPU-hours for training alone.
         Intervention evaluation adds ~10 min/seed for 100 test examples ×
-        8 donors × ~15 arms.  Total ~67 GPU-hours.  168 hours provides
+        8 donors × ~15 arms. Total ~67 GPU-hours. 168 hours provides
         ample margin including job-queue latency.
   rss_limit_gb:
     value: 32
@@ -1317,10 +1511,44 @@ artifact_schema:
     - "config.json"
     - "environment.json"
 
+# ── Source Hashing and Environment ──
 source_hash:
-  value: "git rev-parse HEAD + git diff --stat"
   status: FROZEN_ENGINEERING
-  rationale: "Full source identification for reproducibility."
+  rationale: "Cryptographic source identification for full reproducibility."
+  components:
+    commit_sha:
+      value: "git rev-parse HEAD"
+      status: FROZEN_ENGINEERING
+      rationale: "Full commit SHA for unambiguous VCS reference."
+    tree_sha:
+      value: "git rev-parse HEAD^{tree}"
+      status: FROZEN_ENGINEERING
+      rationale: "Tree SHA captures file-content identity independent of commit metadata."
+    scientific_file_sha256_map:
+      value: "sha256 of each file in src/ + tools/ + tests/ + configs/"
+      status: FROZEN_ENGINEERING
+      rationale: "Per-file content addressing of scientific code; survives renames and rebases."
+    config_digest:
+      value: "sha256 of frozen config JSON"
+      status: FROZEN_ENGINEERING
+      rationale: "Immutable hash of the frozen contract parameters."
+    split_registry_digest:
+      value: "sha256 of seed-to-split registry mapping"
+      status: FROZEN_ENGINEERING
+      rationale: "Deterministic mapping of seeds to splits for reproducibility."
+    environment_digest:
+      value: "sha256(pip freeze + nvidia-smi + python --version + OS info)"
+      status: FROZEN_ENGINEERING
+      rationale: "Complete environment capture for reproducibility."
+  dirty_working_tree:
+    value: "must be false"
+    status: FROZEN_ENGINEERING
+    rationale: >
+      Any uncommitted changes at experiment execution time break reproducibility.
+      Experiments must not run with dirty working trees.
+    sensitivity_analysis: >
+      If a dirty tree is detected, abort the experiment and record the diff
+      as a diagnostic artifact; do not proceed with execution.
 config_hash:
   value: "sha256 of frozen config JSON"
   status: FROZEN_ENGINEERING
@@ -1335,6 +1563,21 @@ no_overwrite_policy:
   rationale: "Prevents accidental overwrite of confirmatory results."
   sensitivity_analysis: "If a job is resubmitted, it must write to a new directory."
 
+# ── Full-Forward Smoke Test Scope ──
+smoke_test_scope:
+  status: FROZEN_ENGINEERING
+  rationale: >
+    Current V1 smoke tests verify ONLY the blank autonomous recurrence step.
+    They do NOT test: token embedding transition, write sequence, GO transition,
+    readout, or logits equivariance. A complete forward-pass smoke test covering
+    ALL sequence phases (blank → embed → write → GO → readout → logits) with
+    U(1) equivariance checks at each phase is required for full model validation.
+  sensitivity_analysis: >
+    Smoke tests limited to the autonomous (blank) step provide no evidence that
+    the full forward model is equivariant or topologically well-behaved during
+    the token-processing phases where vortex structure is measured. A full-forward
+    smoke test gap undermines confidence in topology extraction from non-blank steps.
+
 # ── Unfrozen Parameters Summary ──
 # These values must be set before confirmatory experiment:
 #   1. confirmatory_split.seed_count
@@ -1348,5 +1591,9 @@ no_overwrite_policy:
 #   9. model_conditions.u1.channels.scalar_gateway
 #  10. model_conditions.factorial_variants (included or not)
 #  11. task_conditions.reverse_copy (included or not)
-#  12. primary_statistical_test.alpha — set by PI (default 0.05)
-#  13. SESOI value for power analysis
+#  12. topology_definition.valid_channel.magnitude_threshold
+#  13. primary_statistical_test.method (per-family method)
+#  14. primary_statistical_test.per_family_method
+#  15. sesoi (primary + cross_model)
+#  16. cross_model_comparison.design.equivalence_test (equivalence margin)
+#  17. topology_definition.plaquette_charge.tolerance (UNFROZEN_ENGINEERING)

@@ -1,0 +1,364 @@
+{
+  "config": {
+    "smoke": true,
+    "n_sim": 1000,
+    "n_bootstrap": 199,
+    "n_families": 5,
+    "alpha": 0.05,
+    "master_seed": 42
+  },
+  "scenarios": [
+    {
+      "dist": "gaussian",
+      "correlation_name": "independent",
+      "rho": 0.0,
+      "n_seeds": 10,
+      "effect_size": 0.0,
+      "missing_rate": 0.0,
+      "missing_type": "none",
+      "n_families": 5,
+      "alpha": 0.05,
+      "n_bootstrap": 199,
+      "n_sim": 1000,
+      "method_results": {
+        "naive_bootstrap_percentile": {
+          "iut_rejection_rate": 0.0,
+          "iut_rejections": 0,
+          "ci_coverage": 0.8858,
+          "ci_covered": 4429,
+          "ci_total": 5000,
+          "computation_time_sec": 4.6265833094992574,
+          "per_family_false_positive_rate": 0.0834
+        },
+        "null_centered_wild_bootstrap": {
+          "iut_rejection_rate": 0.0,
+          "iut_rejections": 0,
+          "ci_coverage": 0.8822,
+          "ci_covered": 4411,
+          "ci_total": 5000,
+          "computation_time_sec": 4.6265833094992574,
+          "per_family_false_positive_rate": 0.0812
+        },
+        "one_sample_t_test": {
+          "iut_rejection_rate": 0.0,
+          "iut_rejections": 0,
+          "ci_coverage": 0.9468,
+          "ci_covered": 4734,
+          "ci_total": 5000,
+          "computation_time_sec": 4.6265833094992574,
+          "per_family_false_positive_rate": 0.055
+        },
+        "bootstrap_t_inversion": {
+          "iut_rejection_rate": 0.0,
+          "iut_rejections": 0,
+          "ci_coverage": 1.0,
+          "ci_covered": 5000,
+          "ci_total": 5000,
+          "computation_time_sec": 4.6265833094992574,
+          "per_family_false_positive_rate": 0.0
+        },
+        "exact_sign_flip": {
+          "iut_rejection_rate": 0.0,
+          "iut_rejections": 0,
+          "ci_coverage": 0.8822,
+          "ci_covered": 4411,
+          "ci_total": 5000,
+          "computation_time_sec": 4.6265833094992574,
+          "per_family_false_positive_rate": 0.0532
+        }
+      },
+      "computation_time_sec": 30.841893929995422
+    },
+    {
+      "dist": "gaussian",
+      "correlation_name": "independent",
+      "rho": 0.0,
+      "n_seeds": 10,
+      "effect_size": 0.5,
+      "missing_rate": 0.0,
+      "missing_type": "none",
+      "n_families": 5,
+      "alpha": 0.05,
+      "n_bootstrap": 199,
+      "n_sim": 1000,
+      "method_results": {
+        "naive_bootstrap_percentile": {
+          "iut_rejection_rate": 0.042,
+          "iut_rejections": 42,
+          "ci_coverage": 0.8916,
+          "ci_covered": 4458,
+          "ci_total": 5000,
+          "computation_time_sec": 4.621892227334316
+        },
+        "null_centered_wild_bootstrap": {
+          "iut_rejection_rate": 0.037,
+          "iut_rejections": 37,
+          "ci_coverage": 0.8884,
+          "ci_covered": 4442,
+          "ci_total": 5000,
+          "computation_time_sec": 4.621892227334316
+        },
+        "one_sample_t_test": {
+          "iut_rejection_rate": 0.014,
+          "iut_rejections": 14,
+          "ci_coverage": 0.9536,
+          "ci_covered": 4768,
+          "ci_total": 5000,
+          "computation_time_sec": 4.621892227334316
+        },
+        "bootstrap_t_inversion": {
+          "iut_rejection_rate": 0.0,
+          "iut_rejections": 0,
+          "ci_coverage": 0.9998,
+          "ci_covered": 4999,
+          "ci_total": 5000,
+          "computation_time_sec": 4.621892227334316
+        },
+        "exact_sign_flip": {
+          "iut_rejection_rate": 0.012,
+          "iut_rejections": 12,
+          "ci_coverage": 0.8884,
+          "ci_covered": 4442,
+          "ci_total": 5000,
+          "computation_time_sec": 4.621892227334316
+        }
+      },
+      "computation_time_sec": 30.763820315994963
+    },
+    {
+      "dist": "gaussian",
+      "correlation_name": "moderate",
+      "rho": 0.3,
+      "n_seeds": 10,
+      "effect_size": 0.0,
+      "missing_rate": 0.0,
+      "missing_type": "none",
+      "n_families": 5,
+      "alpha": 0.05,
+      "n_bootstrap": 199,
+      "n_sim": 1000,
+      "method_results": {
+        "naive_bootstrap_percentile": {
+          "iut_rejection_rate": 0.001,
+          "iut_rejections": 1,
+          "ci_coverage": 0.8898,
+          "ci_covered": 4449,
+          "ci_total": 5000,
+          "computation_time_sec": 4.610444661870135,
+          "per_family_false_positive_rate": 0.0754
+        },
+        "null_centered_wild_bootstrap": {
+          "iut_rejection_rate": 0.001,
+          "iut_rejections": 1,
+          "ci_coverage": 0.8854,
+          "ci_covered": 4427,
+          "ci_total": 5000,
+          "computation_time_sec": 4.610444661870135,
+          "per_family_false_positive_rate": 0.0762
+        },
+        "one_sample_t_test": {
+          "iut_rejection_rate": 0.0,
+          "iut_rejections": 0,
+          "ci_coverage": 0.9494,
+          "ci_covered": 4747,
+          "ci_total": 5000,
+          "computation_time_sec": 4.610444661870135,
+          "per_family_false_positive_rate": 0.0524
+        },
+        "bootstrap_t_inversion": {
+          "iut_rejection_rate": 0.0,
+          "iut_rejections": 0,
+          "ci_coverage": 0.9998,
+          "ci_covered": 4999,
+          "ci_total": 5000,
+          "computation_time_sec": 4.610444661870135,
+          "per_family_false_positive_rate": 0.0004
+        },
+        "exact_sign_flip": {
+          "iut_rejection_rate": 0.0,
+          "iut_rejections": 0,
+          "ci_coverage": 0.8854,
+          "ci_covered": 4427,
+          "ci_total": 5000,
+          "computation_time_sec": 4.610444661870135,
+          "per_family_false_positive_rate": 0.05
+        }
+      },
+      "computation_time_sec": 30.703677147001144
+    },
+    {
+      "dist": "gaussian",
+      "correlation_name": "moderate",
+      "rho": 0.3,
+      "n_seeds": 10,
+      "effect_size": 0.5,
+      "missing_rate": 0.0,
+      "missing_type": "none",
+      "n_families": 5,
+      "alpha": 0.05,
+      "n_bootstrap": 199,
+      "n_sim": 1000,
+      "method_results": {
+        "naive_bootstrap_percentile": {
+          "iut_rejection_rate": 0.1,
+          "iut_rejections": 100,
+          "ci_coverage": 0.891,
+          "ci_covered": 4455,
+          "ci_total": 5000,
+          "computation_time_sec": 4.602723216197036
+        },
+        "null_centered_wild_bootstrap": {
+          "iut_rejection_rate": 0.107,
+          "iut_rejections": 107,
+          "ci_coverage": 0.8898,
+          "ci_covered": 4449,
+          "ci_total": 5000,
+          "computation_time_sec": 4.602723216197036
+        },
+        "one_sample_t_test": {
+          "iut_rejection_rate": 0.055,
+          "iut_rejections": 55,
+          "ci_coverage": 0.945,
+          "ci_covered": 4725,
+          "ci_total": 5000,
+          "computation_time_sec": 4.602723216197036
+        },
+        "bootstrap_t_inversion": {
+          "iut_rejection_rate": 0.0,
+          "iut_rejections": 0,
+          "ci_coverage": 1.0,
+          "ci_covered": 5000,
+          "ci_total": 5000,
+          "computation_time_sec": 4.602723216197036
+        },
+        "exact_sign_flip": {
+          "iut_rejection_rate": 0.051,
+          "iut_rejections": 51,
+          "ci_coverage": 0.8898,
+          "ci_covered": 4449,
+          "ci_total": 5000,
+          "computation_time_sec": 4.602723216197036
+        }
+      },
+      "computation_time_sec": 30.62517688600201
+    },
+    {
+      "dist": "gaussian",
+      "correlation_name": "high",
+      "rho": 0.7,
+      "n_seeds": 10,
+      "effect_size": 0.0,
+      "missing_rate": 0.0,
+      "missing_type": "none",
+      "n_families": 5,
+      "alpha": 0.05,
+      "n_bootstrap": 199,
+      "n_sim": 1000,
+      "method_results": {
+        "naive_bootstrap_percentile": {
+          "iut_rejection_rate": 0.006,
+          "iut_rejections": 6,
+          "ci_coverage": 0.8932,
+          "ci_covered": 4466,
+          "ci_total": 5000,
+          "computation_time_sec": 4.595911933416205,
+          "per_family_false_positive_rate": 0.0782
+        },
+        "null_centered_wild_bootstrap": {
+          "iut_rejection_rate": 0.006,
+          "iut_rejections": 6,
+          "ci_coverage": 0.8866,
+          "ci_covered": 4433,
+          "ci_total": 5000,
+          "computation_time_sec": 4.595911933416205,
+          "per_family_false_positive_rate": 0.0766
+        },
+        "one_sample_t_test": {
+          "iut_rejection_rate": 0.004,
+          "iut_rejections": 4,
+          "ci_coverage": 0.9514,
+          "ci_covered": 4757,
+          "ci_total": 5000,
+          "computation_time_sec": 4.595911933416205,
+          "per_family_false_positive_rate": 0.051
+        },
+        "bootstrap_t_inversion": {
+          "iut_rejection_rate": 0.0,
+          "iut_rejections": 0,
+          "ci_coverage": 1.0,
+          "ci_covered": 5000,
+          "ci_total": 5000,
+          "computation_time_sec": 4.595911933416205,
+          "per_family_false_positive_rate": 0.0002
+        },
+        "exact_sign_flip": {
+          "iut_rejection_rate": 0.003,
+          "iut_rejections": 3,
+          "ci_coverage": 0.8866,
+          "ci_covered": 4433,
+          "ci_total": 5000,
+          "computation_time_sec": 4.595911933416205,
+          "per_family_false_positive_rate": 0.0498
+        }
+      },
+      "computation_time_sec": 30.59517588000017
+    },
+    {
+      "dist": "gaussian",
+      "correlation_name": "high",
+      "rho": 0.7,
+      "n_seeds": 10,
+      "effect_size": 0.5,
+      "missing_rate": 0.0,
+      "missing_type": "none",
+      "n_families": 5,
+      "alpha": 0.05,
+      "n_bootstrap": 199,
+      "n_sim": 1000,
+      "method_results": {
+        "naive_bootstrap_percentile": {
+          "iut_rejection_rate": 0.252,
+          "iut_rejections": 252,
+          "ci_coverage": 0.8952,
+          "ci_covered": 4476,
+          "ci_total": 5000,
+          "computation_time_sec": 4.608424386600367
+        },
+        "null_centered_wild_bootstrap": {
+          "iut_rejection_rate": 0.249,
+          "iut_rejections": 249,
+          "ci_coverage": 0.8868,
+          "ci_covered": 4434,
+          "ci_total": 5000,
+          "computation_time_sec": 4.608424386600367
+        },
+        "one_sample_t_test": {
+          "iut_rejection_rate": 0.174,
+          "iut_rejections": 174,
+          "ci_coverage": 0.9462,
+          "ci_covered": 4731,
+          "ci_total": 5000,
+          "computation_time_sec": 4.608424386600367
+        },
+        "bootstrap_t_inversion": {
+          "iut_rejection_rate": 0.0,
+          "iut_rejections": 0,
+          "ci_coverage": 0.9998,
+          "ci_covered": 4999,
+          "ci_total": 5000,
+          "computation_time_sec": 4.608424386600367
+        },
+        "exact_sign_flip": {
+          "iut_rejection_rate": 0.17,
+          "iut_rejections": 170,
+          "ci_coverage": 0.8868,
+          "ci_covered": 4434,
+          "ci_total": 5000,
+          "computation_time_sec": 4.608424386600367
+        }
+      },
+      "computation_time_sec": 30.65956096300215
+    }
+  ],
+  "total_computation_time_sec": 184.2
+}

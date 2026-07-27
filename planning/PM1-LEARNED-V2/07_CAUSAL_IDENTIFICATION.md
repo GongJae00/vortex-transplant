@@ -60,7 +60,10 @@ where:
 - \(s\): seed (generalization unit), drawn from \(P(D_{\text{train}})\)
 - \(\mathcal{R}(s)\): recipient examples for seed \(s\)
 - \(\mathcal{D}_S(r)\): donor candidates selected by frozen selection function \(S\)
-- \(\mathcal{F} = \{\text{smooth}, \text{magnitude}, \text{fourier\_low}, \text{fourier\_high}, \text{PCA}, \text{random\_direction}, \text{harmonic}, \text{same\_charge\_rep}\}\)
+- \(\mathcal{F} = \{\text{smooth}, \text{magnitude}, \text{global\_phase}, \text{zero\_charge\_phase}, \text{fourier\_low}, \text{fourier\_high}, \text{PCA}, \text{random\_direction}, \text{harmonic}, \text{charge\_arrangement\_shuffle}\}\)
+  <!-- canonical null family set: smooth, magnitude, global_phase, zero_charge_phase, fourier_low, fourier_high, PCA, random_direction, harmonic, charge_arrangement_shuffle -->
+  <!-- NULL_FAMILIES: smooth, magnitude, global_phase, zero_charge_phase, fourier_low, fourier_high, pca, random_direction, harmonic, charge_arrangement_shuffle
+  -->
 - \(M_a(r,d)\): arm \(a\)의 behavioral effect (donor-transfer metric, §7.2)
 
 **All-admissible estimand (sensitivity)**:
@@ -312,12 +315,17 @@ Is the effect invariant to the specific gauge choice?
 Do other hidden-state features carry similar information?
 - `smooth`: smooth component transplant
 - `magnitude`: magnitude component transplant
+- `global_phase`: uniform phase rotation control
+- `zero_charge_phase`: spatially structured zero-charge control
 - `fourier_low`: Fourier low-pass (retain k ≤ cutoff)
 - `fourier_high`: Fourier high-pass (retain k > cutoff)
 - `PCA`: PCA projection transplant (top-k components)
 - `random_direction`: norm-matched random direction (B ≥ 99 samples per pair)
 - `harmonic`: harmonic sector swap (same vortex, different harmonic cycle holonomy)
-- `same_charge_rep`: 다른 same-charge representative 하나를 null baseline으로 사용 (가장 strict한 대조군)
+- `charge_arrangement_shuffle`: charge-count-matched random arrangement (keeps charge density, randomizes positions)
+
+**Note on representative sensitivity**:
+Representative sensitivity (`same_charge_rep`) is a separate mandatory gate, NOT part of the comparable null family list. It tests invariance under the zero-charge multiplicative factor, which is a scientific validity condition rather than a competing mechanistic hypothesis.
 
 ### Natural Controls
 Is the intervention on-manifold?
@@ -450,7 +458,7 @@ Possible (vortex가 noisy full state보다 pure한 information carrier일 수 �
 | `smooth` | Smooth phase component가 효과의 원인 | \(\delta_{\text{smooth}} \leq 0\) | One-sided paired bootstrap |
 | `magnitude` | Amplitude modulation이 효과의 원인 | \(\delta_{\text{mag}} \leq 0\) | One-sided paired bootstrap |
 | `harmonic` | Global holonomy가 효과의 원인 | \(\delta_{\text{harm}} \leq 0\) | One-sided paired bootstrap |
-| `same_charge_rep` | Specific gauge choice가 charge class보다 중요 | \(\text{Var}_{\text{rep}} \gg 0\) | Variance decomposition |
+| `charge_arrangement_shuffle` | Charge spatial arrangement이 효과의 원인 | \(\delta_{\text{shuffle}} \leq 0\) | One-sided paired bootstrap |
 
 **Primary test (IUT)**: \(\max_{f} p_f \leq \alpha\). Bonferroni 불필요.
 
@@ -458,8 +466,11 @@ Possible (vortex가 noisy full state보다 pure한 information carrier일 수 �
 이것이 vortex가 가장 근소하게 이긴 family이며, 잠재적 weakness를 드러낸다.
 
 **Per-family randomization draws**:
-- `random_direction`: per-pair B ≥ 199 random draws. Family-level statistic: q95 of random draws.
-- `same_charge_rep`: K ≥ 5 representatives per pair. Family-level statistic: Var_rep / Var_charge.
+- `random_direction`: per-pair B ≥ 199 random draws. Family-level statistic: per-seed q95 of random draws.
+- `charge_arrangement_shuffle`: B ≥ 199 shuffles per pair. Family-level statistic: per-seed mean shuffle margin.
+
+**Separate gate — representative sensitivity** (NOT in null family list):
+- K ≥ 5 same-charge representatives per pair. Gate: Var_rep / Var_charge ≤ τ_rep (UNFROZEN).
 
 ---
 

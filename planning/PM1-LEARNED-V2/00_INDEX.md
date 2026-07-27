@@ -35,13 +35,19 @@
 | S6 | `diagnostics/commands.txt` | COMPLETE | Reproduction commands |
 | S7 | `diagnostics/raw/untrained_gate_replication.json` | COMPLETE | Raw diagnostic output |
 | S8 | `diagnostics/sha256.json` | COMPLETE | SHA-256 of all planning docs |
-| S9 | `tools/validate_plan.py` | COMPLETE | Plan integrity linter |
+| S9 | `tools/validate_plan.py` | COMPLETE | Plan integrity linter (5-layer) |
+| S10 | `tools/verify_manifest.py` | COMPLETE | SHA-256 manifest verifier |
+| S11 | `tools/run_statistical_method_simulation.py` | COMPLETE | Statistical method simulation |
+| S12 | `tools/simulation_results.json` | COMPLETE | Simulation output |
+| S13 | `diagnostics/run_rng_audit.py` | COMPLETE | Multi-process RNG audit |
+| S14 | `diagnostics/run_canonical_order_audit.py` | COMPLETE | Canonical-order audit |
+| S15 | `diagnostics/raw/rng_audit.json` | COMPLETE | RNG audit raw output |
 
 ## Status Totals
 
 | Status | Count |
 |--------|------:|
-| COMPLETE | 24 |
+| COMPLETE | 30 |
 | PARTIAL | 4 |
 | BLOCKED | 0 |
 | NOT_STARTED | 0 |

@@ -1,8 +1,12 @@
 {
-  "python": "3.11+",
-  "pytorch": "2.12+",
-  "numpy": "2.0+",
+  "python": "3.12.13",
+  "pytorch": "2.12.1+cu130",
+  "numpy": "2.5.1",
+  "scipy": "1.14+",
   "device": "cpu",
+  "platform": "Linux-6.18.33.2-microsoft-standard-WSL2-x86_64",
+  "processor": "x86_64",
   "commit": "67b216bf05382c344425ea493119828412c5b3c5",
-  "timestamp": "2026-07-27"
+  "timestamp": "2026-07-27T12:00:00+09:00",
+  "torch_deterministic": false
 }
