@@ -1,0 +1,50 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "vortex-transplant"
+version = "0.0.1"
+description = "Topological defect causal intervention for U(1)-equivariant neural networks"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [
+  { name = "GongJae" },
+]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Science/Research",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+  "numpy>=2.0",
+  "pandas>=2.2,<4",
+  "scipy>=1.14",
+  "torch>=2.12,<2.13",
+  "torchdiffeq==0.2.5",
+]
+
+[project.urls]
+Repository = "https://github.com/anomalyco/vortex-transplant"
+
+[dependency-groups]
+dev = [
+  "pytest>=8.3",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["topological*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+  "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+]
+filterwarnings = [
+  "ignore:`torch.jit.script` is deprecated.*:DeprecationWarning:torch.jit._script",
+]

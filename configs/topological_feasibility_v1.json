@@ -1,0 +1,26 @@
+{
+  "artifact_root": "/mnt/r/research-data/aligned-mask-transplant/pm1/feasibility-v1",
+  "contract": "PM1-FEASIBILITY-V1",
+  "device": "cpu",
+  "exact_tolerance": 1e-10,
+  "field_count_per_seed": 32,
+  "grid": [
+    32,
+    32
+  ],
+  "hybrid_tolerance": 0.05,
+  "magnitude_bounds": [
+    0.75,
+    1.25
+  ],
+  "rss_limit_bytes": 4294967296,
+  "seeds": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "smooth_link_amplitude": 0.1,
+  "wall_limit_seconds": 1200.0
+}
