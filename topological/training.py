@@ -74,14 +74,20 @@ class TrainingResult:
     training_log: list[TrainingSnapshot] = field(default_factory=list)
 
 
-def configure_determinism(seed: int) -> None:
+def configure_determinism(seed: int, *, benchmark: bool = False) -> None:
     torch.manual_seed(namespace_seed(seed, "torch"))
     if torch.cuda.is_available():
         torch.cuda.manual_seed_all(namespace_seed(seed, "cuda"))
-    torch.use_deterministic_algorithms(True)
-    if torch.backends.cudnn.is_available():
-        torch.backends.cudnn.benchmark = False
-        torch.backends.cudnn.deterministic = True
+    if benchmark:
+        torch.use_deterministic_algorithms(False)
+        if torch.backends.cudnn.is_available():
+            torch.backends.cudnn.benchmark = True
+            torch.backends.cudnn.deterministic = False
+    else:
+        torch.use_deterministic_algorithms(True)
+        if torch.backends.cudnn.is_available():
+            torch.backends.cudnn.benchmark = False
+            torch.backends.cudnn.deterministic = True
 
 
 def make_model(

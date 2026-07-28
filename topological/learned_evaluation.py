@@ -795,3 +795,119 @@ def decide_learned_pilot(
         "per_model": model_fields,
         **model_fields,
     }
+
+
+# ── Optimized batched evaluation (all arms in one forward pass) ──
+
+@torch.no_grad()
+def evaluate_seed_optimized(model, seed, *, task_type="copy"):
+    """Batched evaluation: stacks all intervention arms into one continue_copy.
+    
+    ~3x faster than evaluate_seed_model on GPU."""
+    model.eval()
+    device = next(model.parameters()).device
+    batch = generate_copy_batch(seed, "test/heldout-delay-64", TEST_EXAMPLES, TEST_DELAY, device=device)
+    trace = run_copy(model, batch.symbols, TEST_DELAY)
+    targets = torch.flip(batch.symbols, dims=[1]) if task_type == "reverse" else batch.symbols
+    accuracy = float((trace.logits.argmax(dim=-1) == targets).float().mean().cpu())
+    post_topology = [analyze_topology(s) for s in trace.post_write]
+    defect_prevalence = sum(r.nonzero_defect for r in post_topology) / TEST_EXAMPLES
+    persistence = [signed_jaccard(post_topology[i], analyze_topology(trace.pre_go[i])) for i in range(TEST_EXAMPLES)]
+
+    catalog_symbols = donor_sequences(batch.symbols)
+    flat_donors = catalog_symbols.reshape(TEST_EXAMPLES * DONORS_PER_RECIPIENT, batch.copy_length)
+    flat_hidden = post_write_in_chunks(model, flat_donors)
+    recipient_hidden = trace.post_write.detach().cpu()
+
+    selected, pair_indices = [], []
+    for ri in range(TEST_EXAMPLES):
+        donors = [flat_hidden[ri * DONORS_PER_RECIPIENT + di] for di in range(DONORS_PER_RECIPIENT)]
+        pair = select_donor_pair(recipient_hidden[ri], donors)
+        if pair is not None:
+            selected.append(pair); pair_indices.append(ri)
+
+    if not selected:
+        return {"task_accuracy": accuracy, "defect_prevalence": defect_prevalence, "pair_count": 0, "status": "NO_PAIRS"}
+
+    arms = ["vortex", "smooth", "magnitude", "whole_phase", "whole_state",
+            "fourier_low", "fourier_high", "random_direction"]  # PCA excluded (needs fitted model)
+    all_fields = {}
+    for pair in selected:
+        r, d = pair.recipient, pair.donor
+        for arm in arms:
+            if arm in ("vortex", "smooth", "magnitude", "whole_phase", "whole_state"):
+                f = component_intervention(r, d, arm)
+            elif arm == "fourier_low":
+                f = fourier_field_intervention(pair.recipient_field, pair.donor_field, "fourier_low")
+            elif arm == "fourier_high":
+                f = fourier_field_intervention(pair.recipient_field, pair.donor_field, "fourier_high")
+            elif arm == "random_direction":
+                f = random_direction_intervention(pair.recipient_field, pair.donor_field, seed=0)
+            all_fields.setdefault(arm, []).append(f)
+
+    n_pairs = len(selected)
+    arm_fields = []
+    arm_names = sorted(all_fields)
+    for arm in arm_names:
+        for f in all_fields[arm]:
+            arm_fields.append(complex_to_hidden(f).unsqueeze(0))
+    arm_batch = torch.cat(arm_fields, dim=0).to(device)
+
+    arm_logits, _ = continue_copy(model, arm_batch, TEST_DELAY, copy_length=batch.copy_length)
+    donor_indices = [p.donor_index for p in selected]
+    donor_targets = torch.stack([catalog_symbols.reshape(TEST_EXAMPLES, DONORS_PER_RECIPIENT, batch.copy_length)[pi, di]
+                                  for pi, di in zip(pair_indices, donor_indices)]).to(device)
+    recipient_targets = batch.symbols[pair_indices].to(device)
+
+    margins = {}
+    for arm in arm_names:
+        start = arm_names.index(arm) * n_pairs
+        ll = arm_logits[start:start + n_pairs]
+        r_ll = torch.gather(ll.log_softmax(dim=-1), -1, recipient_targets.unsqueeze(-1).expand(-1, -1, 10)).squeeze(-1).mean(-1).cpu().numpy()
+        d_ll = torch.gather(ll.log_softmax(dim=-1), -1, donor_targets.unsqueeze(-1).expand(-1, -1, 10)).squeeze(-1).mean(-1).cpu().numpy()
+        margins[arm] = (d_ll - r_ll).tolist()
+
+    return {"task_accuracy": accuracy, "defect_prevalence": defect_prevalence,
+            "mean_persistence": float(np.mean(persistence)) if persistence else 0.0,
+            "pair_count": n_pairs, "per_family_margins": margins,
+            "vortex_mean_margin": float(np.mean(margins.get("vortex", [0.0]))),
+            "whole_state_margins": margins.get("whole_state", [])}
+
+
+# ── Calibration executor ──
+
+def run_calibration(output_dir, device, n_seeds=3, n_updates=5000):
+    """Train C=1 models and evaluate topology. ~1.5h on RTX 5080."""
+    import time, json
+    from pathlib import Path
+    from .model import ModelSpec
+    from ._artifacts import WriteOnceArtifact
+
+    spec = ModelSpec(channels=1)
+    output = Path(output_dir)
+    writer = WriteOnceArtifact(output)
+    results = {"seeds": {}}
+
+    for seed in range(n_seeds):
+        configure_determinism(seed, benchmark=True)
+        from .model import make_scalar_u1_model
+        model = make_scalar_u1_model(model_spec=spec, device=device)
+        training = train_seed(seed, model_type="u1", model_spec=spec,
+                              training_spec=TrainingSpec(updates=n_updates), device=device)
+        eval_result = evaluate_seed_optimized(training.model, seed)
+        results["seeds"][f"seed_{seed}"] = {
+            "accuracy": float(training.selected_accuracy),
+            "defect_prevalence": eval_result.get("defect_prevalence", 0),
+            "vortex_margin": eval_result.get("vortex_mean_margin", 0),
+            "pair_count": eval_result.get("pair_count", 0),
+        }
+        del model, training
+        if device.type == "cuda":
+            torch.cuda.empty_cache()
+
+    accs = [r["accuracy"] for r in results["seeds"].values()]
+    results["mean_accuracy"] = float(np.mean(accs))
+    results["overall_pass"] = results["mean_accuracy"] >= 0.90
+    writer.write_json("results.json", results)
+    writer.finalize()
+    return results
