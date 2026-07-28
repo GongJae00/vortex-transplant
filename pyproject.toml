@@ -26,10 +26,11 @@ dependencies = [
   "scipy>=1.14",
   "torch>=2.12,<2.13",
   "torchdiffeq==0.2.5",
+  "scikit-learn>=1.5",
 ]
 
 [project.urls]
-Repository = "https://github.com/anomalyco/vortex-transplant"
+Repository = "https://github.com/GongJae00/vortex-transplant"
 
 [dependency-groups]
 dev = [
