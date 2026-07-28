@@ -6,8 +6,8 @@ Tests whether intervention effects are invariant to the specific
 representative choice (gauge/section choice of the same topology class).
 """
 import numpy as np
-from ..topology import canonical_vortex_field, extract_charge
-from ._types import RepresentativeSpec, RepresentativeSample
+from .topology import canonical_vortex_field, extract_charge
+from .types import RepresentativeSpec, RepresentativeSample
 
 
 def sample_representatives(

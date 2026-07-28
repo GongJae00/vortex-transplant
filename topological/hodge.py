@@ -4,7 +4,7 @@ Produces: exact (curl-free), coexact (div-free, carries vortex charge),
 harmonic (both curl-free and div-free, 2D on T²), and branch integer cochain.
 """
 import numpy as np
-from ..topology import extract_charge
+from .topology import extract_charge
 
 
 def compact_hodge_decompose(

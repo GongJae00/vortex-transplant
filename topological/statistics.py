@@ -4,7 +4,7 @@ Primary method: null-centered wild bootstrap at seed level.
 IUT: reject global H₀ iff max(p_f) ≤ α for all null families.
 """
 import numpy as np
-from ._types import BootstrapResult, IUTResult
+from .types import BootstrapResult, IUTResult
 
 
 def hierarchical_bootstrap(

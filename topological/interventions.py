@@ -212,7 +212,7 @@ def matched_zero_charge_phase(
     """Spatially structured zero-charge phase perturbation.
 
     In contrast to matched_global_phase (uniform rotation across all sites),
-    this applies a sign-structured spatial pattern (±1 per row) scaled by
+    this applies a sign-structured spatial pattern ( +/- 1 per row) scaled by
     epsilon, resulting in a spatially varying phase that carries zero total
     topological charge.  This controls for structured-nonuniform phase
     displacement without introducing new vortex defects.

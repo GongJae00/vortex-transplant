@@ -170,3 +170,104 @@ def canonical_vortex_field(charge: np.ndarray) -> CanonicalVortexField:
         holonomy_y=final_holonomy_y,
         integration_residual_max=integration_residual,
     )
+
+
+# ── V2 extensions: branch margin, charge-flip radius, defect tracking ──
+
+import numpy as np
+from .types import BranchStability
+
+
+def compute_branch_margins(field):
+    """Compute branch margin statistics for a complex 2D field."""
+    from .topology import extract_charge, phase_links
+    H, W = field.shape
+    unit = field / (np.abs(field) + 1e-12)
+    dx, dy = phase_links(unit)
+    dx_pad = np.concatenate([dx, dx[:, :1]], axis=1)
+    dy_pad = np.concatenate([dy, dy[:1, :]], axis=0)
+    all_margins = np.concatenate([(np.pi - np.abs(dx_pad)).ravel(), (np.pi - np.abs(dy_pad)).ravel()])
+    charge = extract_charge(field)
+    charge_positions = np.argwhere(np.abs(charge.charge) > 0)
+    flip_radii = []
+    if len(charge_positions) > 0:
+        for px, py in charge_positions[:20]:
+            radius = _measure_charge_flip_radius(field, px, py)
+            flip_radii.append(radius)
+    median_flip = float(np.median(flip_radii)) if flip_radii else 0.0
+    return BranchStability(
+        min_margin=float(np.min(all_margins)),
+        q01_margin=float(np.quantile(all_margins, 0.01)),
+        q05_margin=float(np.quantile(all_margins, 0.05)),
+        median_margin=float(np.median(all_margins)),
+        charge_flip_radius_median=median_flip,
+    )
+
+
+def compute_per_channel_branch_margins(field):
+    """Compute branch margins for each channel in (C, H, W) field."""
+    return [compute_branch_margins(field[ch]) for ch in range(field.shape[0])]
+
+
+def _measure_charge_flip_radius(field, x, y, eps_values=None):
+    if eps_values is None:
+        eps_values = [0.001, 0.005, 0.01, 0.02, 0.05, 0.1, 0.2, 0.5]
+    from .topology import extract_charge
+    charge_ref = extract_charge(field)
+    ref_val = charge_ref.charge[x, y]
+    for eps in eps_values:
+        for sign in [1.0, -1.0]:
+            perturbed = field.copy()
+            perturbed[x, y] *= np.exp(1j * sign * eps)
+            if extract_charge(perturbed).charge[x, y] != ref_val:
+                return eps
+    return float("inf")
+
+
+def defect_tracking(field_t, field_t1, max_displacement=2):
+    """Track signed defects between consecutive time steps."""
+    from .topology import extract_charge
+    charge_t = extract_charge(field_t)
+    charge_t1 = extract_charge(field_t1)
+    H, W = charge_t.charge.shape
+    defects_t = [(x, y, charge_t.charge[x, y]) for x in range(H) for y in range(W) if charge_t.charge[x, y] != 0]
+    defects_t1 = [(x, y, charge_t1.charge[x, y]) for x in range(H) for y in range(W) if charge_t1.charge[x, y] != 0]
+    matched = []
+    unmatched_t1 = list(defects_t1)
+    for dx, dy, dq in defects_t:
+        best_dist, best_idx = float("inf"), -1
+        for i, (dx1, dy1, dq1) in enumerate(unmatched_t1):
+            if dq != dq1: continue
+            dist = abs(dx - dx1) + abs(dy - dy1)
+            dist = min(dist, abs(dx - dx1 - H), abs(dy - dy1 - W))
+            if dist < best_dist and dist <= max_displacement:
+                best_dist, best_idx = dist, i
+        if best_idx >= 0:
+            matched.append((dx, dy, unmatched_t1[best_idx][0], unmatched_t1[best_idx][1], dq))
+            unmatched_t1.pop(best_idx)
+    births = [(x, y, q) for x, y, q in unmatched_t1]
+    deaths = [(dx, dy, dq) for dx, dy, dq in defects_t if not any(m[0] == dx and m[1] == dy for m in matched)]
+    intersection = len(matched)
+    union = len(defects_t) + len(defects_t1) - intersection
+    return {"matched": matched, "births": births, "deaths": deaths, "signed_jaccard": intersection / max(union, 1),
+            "n_defects_t": len(defects_t), "n_defects_t1": len(defects_t1)}
+
+
+def per_channel_defect_prevalence(field):
+    """Per-channel presence of both + and - defects."""
+    from .topology import extract_charge
+    result = []
+    for ch in range(field.shape[0]):
+        charge = extract_charge(field[ch])
+        result.append(int(np.sum(charge.charge > 0)) > 0 and int(np.sum(charge.charge < 0)) > 0)
+    return tuple(result)
+
+
+def extract_charge_map(field):
+    """Extract charge map summed across channels. (C,H,W) -> (H,W) integer."""
+    from .topology import extract_charge
+    C, H, W = field.shape
+    total = np.zeros((H, W), dtype=int)
+    for ch in range(C):
+        total += extract_charge(field[ch]).charge
+    return total

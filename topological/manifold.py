@@ -6,7 +6,7 @@ of hidden states produced by the trained model.
 import numpy as np
 from sklearn.decomposition import PCA
 from sklearn.neighbors import NearestNeighbors
-from ._types import ManifoldModel, ManifoldDiagnostics
+from .types import ManifoldModel, ManifoldDiagnostics
 
 
 def fit_manifold_model(

@@ -10,9 +10,9 @@ This is NOT the same as canonical vortex transplant — it is a
 constrained optimization over the field configuration.
 """
 import numpy as np
-from ..topology import extract_charge, canonical_vortex_field
-from ..decomposition import decompose
-from ._types import SurgerySpec, SurgeryResult
+from .topology import extract_charge, canonical_vortex_field
+from .decomposition import decompose
+from .types import SurgerySpec, SurgeryResult
 
 
 def minimal_topological_surgery(

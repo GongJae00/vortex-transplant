@@ -10,7 +10,7 @@ import json
 import os
 import yaml
 from pathlib import Path
-from ._types import ContractState, SplitAuthorization
+from .types import ContractState, SplitAuthorization
 
 
 VALID_SPLITS = frozenset({"development", "calibration", "confirmatory"})

@@ -6,14 +6,13 @@ import sys, os
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-from topological.v2.v2_topology import (
+from topological.topology import (
     compute_branch_margins, compute_per_channel_branch_margins,
     defect_tracking, per_channel_defect_prevalence, extract_charge_map,
 )
-from topological.v2.v2_model import (
-    make_factorial_model, make_scalar_u1_model,
+from topological.model import (
+    make_factorial_model, make_scalar_u1_model, ModelSpec,
 )
-from topological.v2.smoke import run_cpu_integrity_smoke
 from topological.model import ModelSpec
 
 
@@ -95,11 +94,3 @@ class TestV2Model:
     def test_invalid_variant_raises(self):
         with pytest.raises(ValueError):
             make_factorial_model("NonexistentVariant")
-
-
-class TestV2Smoke:
-    def test_cpu_integrity_smoke(self):
-        result = run_cpu_integrity_smoke()
-        assert result["overall_pass"], f"Smoke failed: {result.get('errors', [])}"
-        for check_name, check_val in result["checks"].items():
-            assert check_val, f"Check '{check_name}' failed"

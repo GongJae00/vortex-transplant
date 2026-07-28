@@ -6,22 +6,22 @@ import sys, os
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-from topological.v2.statistics import (
+from topological.statistics import (
     hierarchical_bootstrap, wild_bootstrap, iut_test, compute_sesoi,
 )
-from topological.v2.hodge import (
+from topological.hodge import (
     compact_hodge_decompose, extract_harmonic_sector,
     validate_hodge_decomposition,
 )
-from topological.v2.surgery import (
+from topological.surgery import (
     minimal_topological_surgery, annihilate_single_pair, sham_surgery,
     SurgerySpec,
 )
-from topological.v2.protocol import (
+from topological.protocol import (
     namespace_seed, authorize_split,
     load_contract, contract_digest,
 )
-from topological.v2._types import ContractState
+from topological.types import ContractState
 
 
 class TestStatistics:
