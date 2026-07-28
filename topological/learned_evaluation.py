@@ -27,6 +27,7 @@ from .interventions import (
     random_direction_intervention,
     state_displacement,
 )
+from .training import configure_determinism, train_seed, TrainingSpec
 from .task import (
     BLANK_TOKEN,
     continue_copy,
