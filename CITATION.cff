@@ -1,6 +1,6 @@
 cff-version: 1.2.0
 message: "If you use this software, please cite the corresponding research paper."
-title: "Aligned Mask Transplant: Mechanism-first Causal Tests for Neural Representations"
+title: "vortex-transplant: Topological Defect Causal Intervention for U(1)-Equivariant Neural Networks"
 type: software
 repository-code: "https://github.com/GongJae00/vortex-transplant"
 license: MIT

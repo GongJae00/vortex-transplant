@@ -1,9 +1,8 @@
-"""V2 dataclass specifications. All fields are frozen after construction."""
+"""Dataclass specifications. All fields are frozen after construction."""
 from dataclasses import dataclass, field
 from typing import Optional
 import numpy as np
 
-# ── Topology ──
 
 @dataclass(frozen=True)
 class BranchStability:
@@ -35,7 +34,6 @@ class TopologyStatsV2:
     maximum_integer_residual: float
     minimum_magnitude: float
 
-# ── Hodge ──
 
 @dataclass(frozen=True)
 class HodgeComponents:
@@ -52,7 +50,6 @@ class HodgeComponents:
             if v.shape != shape:
                 raise ValueError(f"{name}.shape={v.shape} != coexact.shape={shape}")
 
-# ── Representatives ──
 
 @dataclass(frozen=True)
 class RepresentativeSpec:
@@ -69,7 +66,6 @@ class RepresentativeSample:
     energy_variance: float
     spectrum_variance: float
 
-# ── Surgery ──
 
 @dataclass(frozen=True)
 class SurgerySpec:
@@ -96,7 +92,6 @@ class SurgeryResult:
     iterations: int
     failure_reason: Optional[str]
 
-# ── Manifold ──
 
 @dataclass(frozen=True)
 class ManifoldModel:
@@ -115,7 +110,6 @@ class ManifoldDiagnostics:
     relaxation_drift: float
     on_manifold: bool
 
-# ── Interventions (V2) ──
 
 @dataclass(frozen=True)
 class InterventionSpecV2:
@@ -139,7 +133,6 @@ class BehavioralOutcomeV2:
     component_guards: dict[str, bool]
     manifold_diagnostics: ManifoldDiagnostics
 
-# ── Selection ──
 
 @dataclass(frozen=True)
 class SelectionFunnel:
@@ -150,7 +143,6 @@ class SelectionFunnel:
     donor_kept: int
     total_input: int
 
-# ── Evaluation ──
 
 @dataclass(frozen=True)
 class SeedEvaluationV2:
@@ -189,7 +181,6 @@ class CrossModelDecisionV2:
     cross_model_pass: bool
     overall_status: str
 
-# ── Protocol ──
 
 @dataclass(frozen=True)
 class ContractState:
@@ -205,7 +196,6 @@ class SplitAuthorization:
     authorized: bool
     reason: str
 
-# ── Statistics ──
 
 @dataclass(frozen=True)
 class BootstrapResult:

@@ -1,4 +1,4 @@
-"""Minimal topological surgery solver for V2.
+"""Minimal topological surgery solver.
 
 Given a recipient field and a target charge map, finds the field that:
 1. Has exactly the target charge map
@@ -155,7 +155,6 @@ def sham_surgery(
     return minimal_topological_surgery(field, charge_map, spec)
 
 
-# ── Internal helpers ──
 
 def _compute_target_vortex(target_charge: np.ndarray, C: int, H: int, W: int) -> np.ndarray:
     """Compute canonical vortex field for a charge map, replicated across channels."""

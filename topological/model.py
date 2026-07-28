@@ -245,7 +245,6 @@ class PlainConvRNN(nn.Module):
         return self.spec.real_state_size * element_size
 
 
-# ── V2 extensions: C=1 gateway, factorial 2x2 baseline variants ──
 
 import types
 import torch.nn.functional as F

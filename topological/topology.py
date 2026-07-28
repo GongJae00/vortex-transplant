@@ -172,7 +172,6 @@ def canonical_vortex_field(charge: np.ndarray) -> CanonicalVortexField:
     )
 
 
-# ── V2 extensions: branch margin, charge-flip radius, defect tracking ──
 
 import numpy as np
 from .types import BranchStability

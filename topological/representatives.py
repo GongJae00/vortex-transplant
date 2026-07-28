@@ -1,4 +1,4 @@
-"""Same-charge representative sampling for V2.
+"""Same-charge representative sampling.
 
 Given a charge map Q, generates multiple complex fields v_Q · g
 where g is a zero-local-charge multiplicative factor (smooth, charge-free).
@@ -121,7 +121,6 @@ def representative_variance_decomposition(
     }
 
 
-# ── Helpers ──
 
 def _generate_smooth_phase(H: int, W: int, rng: np.random.Generator) -> np.ndarray:
     """Generate band-limited smooth phase field."""

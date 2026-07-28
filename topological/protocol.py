@@ -1,4 +1,4 @@
-"""Split enforcement and contract loading for V2.
+"""Split enforcement and contract loading.
 
 Ensures calibration/confirmatory isolation:
 - Confirmatory split cannot use calibration config

@@ -1,4 +1,4 @@
-"""Hierarchical bootstrap and intersection-union test for V2.
+"""Hierarchical bootstrap and intersection-union test.
 
 Primary method: null-centered wild bootstrap at seed level.
 IUT: reject global H₀ iff max(p_f) ≤ α for all null families.

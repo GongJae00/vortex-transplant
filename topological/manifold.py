@@ -1,4 +1,4 @@
-"""Manifold diagnostics for V2.
+"""Manifold diagnostics.
 
 Tests whether intervened hidden states lie on the natural manifold
 of hidden states produced by the trained model.
