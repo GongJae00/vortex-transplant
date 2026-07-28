@@ -150,16 +150,21 @@ def train_seed_optimized(
     _accum_grad = 0.0
     _accum_count = 0
 
+    # Pre-construct TrainingSpec for reuse (avoids per-iteration allocation)
+    _train_spec = TrainingSpec(
+        updates=spec.updates, batch_size=spec.batch_size,
+        train_delay_min=spec.train_delay_min, train_delay_max=spec.train_delay_max,
+        copy_length=spec.copy_length,
+    )
+    _val_spec = TrainingSpec(
+        updates=spec.updates, batch_size=spec.batch_size,
+        train_delay_min=spec.train_delay_min, train_delay_max=spec.train_delay_max,
+        validation_examples=spec.validation_examples,
+        copy_length=spec.copy_length,
+    )
+
     for update in range(1, spec.updates + 1):
-        batch = training_batch(
-            seed, update,
-            TrainingSpec(
-                updates=spec.updates, batch_size=spec.batch_size,
-                train_delay_min=spec.train_delay_min, train_delay_max=spec.train_delay_max,
-                copy_length=spec.copy_length,
-            ),
-            device=device,
-        )
+        batch = training_batch(seed, update, _train_spec, device=device)
         loss, gradient_norm = one_training_step_optimized(
             model, optimizer, batch, spec.gradient_clip, use_amp=spec.use_amp,
         )
@@ -172,15 +177,7 @@ def train_seed_optimized(
         _accum_count += 1
 
         if update % spec.validation_interval == 0:
-            record = validate_model(
-                model, seed, update,
-                TrainingSpec(
-                    updates=spec.updates, batch_size=spec.batch_size,
-                    train_delay_min=spec.train_delay_min, train_delay_max=spec.train_delay_max,
-                    validation_examples=spec.validation_examples,
-                    copy_length=spec.copy_length,
-                ),
-            )
+            record = validate_model(model, seed, update, _val_spec)
             history.append(record)
             training_log.append(TrainingSnapshot(
                 update=update,

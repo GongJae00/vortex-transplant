@@ -73,13 +73,14 @@ def _override_step_to_radial(model):
         B, _, C, H, W = hidden.shape  # (B, 2, C, H, W)
         flat = hidden.reshape(B, C * 2, H, W)
         pre = self.conv(flat) + self.embedded_input(tokens).reshape(B, C * 2, H, W)
-        out = torch.zeros_like(pre)
-        for ch in range(0, pre.shape[1], 2):
-            real = pre[:, ch]
-            imag = pre[:, ch + 1]
-            r = torch.sqrt(real**2 + imag**2 + 1e-8)
-            rt = torch.tanh(r) / (r + 1e-8)
-            out[:, ch] = rt * real
-            out[:, ch + 1] = rt * imag
-        return self.norm(out).reshape(B, 2, C, H, W)  # back to (B, 2, C, H, W)
+        # Vectorized radial_tanh: reshape (B, C*2, H, W) -> (B, C, 2, H, W)
+        pre_reshaped = pre.reshape(B, C, 2, H, W)
+        real = pre_reshaped[:, :, 0]    # (B, C, H, W)
+        imag = pre_reshaped[:, :, 1]    # (B, C, H, W)
+        r = torch.sqrt(real**2 + imag**2 + 1e-8)
+        rt = torch.tanh(r) / (r + 1e-8)
+        out = torch.zeros_like(pre_reshaped)
+        out[:, :, 0] = rt * real
+        out[:, :, 1] = rt * imag
+        return self.norm(out.reshape(B, C * 2, H, W)).reshape(B, 2, C, H, W)
     model.step = types.MethodType(step_rad, model)
